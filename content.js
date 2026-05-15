@@ -5,10 +5,16 @@ window.RYOTAQC_CONTENT = {
     menuLabel: "menu",
     introTag: "QC motion homepage",
     topLinks: [
+      { label: "Knowladge", target: "#panel-intro" },
+      { label: "Tools", target: "#panel-driver" },
       { label: "SOP", target: "#panel-sop" },
-      { label: "Battery", target: "#panel-battery" },
-      { label: "Maintenance", target: "#panel-maintenance" },
-      { label: "Driver", target: "#panel-driver" }
+      { label: "Tutorial", target: "#panel-split" },
+      { label: "Windows Tips And Trick", target: "#panel-maintenance" },
+      { label: "MacOS Information", target: "#panel-words" },
+      { label: "Quiz", target: "#panel-battery" },
+      { label: "Information", target: "#panel-cta" },
+      { label: "Tentang", target: "#panel-cta" },
+      { label: "Kontak", target: "#site-footer" }
     ]
   },
   panels: [

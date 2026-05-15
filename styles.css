@@ -65,6 +65,16 @@ a {
   gap: 0.5rem;
 }
 
+.topbar-center {
+  max-width: min(64vw, 980px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topbar-center::-webkit-scrollbar {
+  display: none;
+}
+
 .circle-btn,
 .pill-btn {
   border: 1px solid var(--stroke-light);
@@ -103,6 +113,7 @@ a {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   opacity: 0.74;
+  white-space: nowrap;
 }
 
 .top-nav-link:hover {
