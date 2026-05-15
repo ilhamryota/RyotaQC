@@ -4,6 +4,16 @@ window.RYOTAQC_CONTENT = {
     brandPill: "ryotaqc",
     menuLabel: "menu",
     introTag: "SOP Battery Running Test",
+    maintenance: {
+      // Ubah ke true untuk mengaktifkan maintenance mode.
+      enabled: false,
+      title: "Website Sedang Dalam Tahap Pengembangan",
+      message:
+        "RyotaQC sedang maintenance untuk update fitur dan perbaikan tampilan. Silakan cek kembali setelah proses selesai. Sambil menunggu, kamu bisa main mini game Tap Tap Shoot Basketball di bawah.",
+      image: "assets/images/step-maintenance-repair.webp",
+      imageAlt: "Ilustrasi maintenance laptop",
+      gameTitle: "Tap Tap Shoot Basketball"
+    },
     topLinks: [
       { label: "Knowladge", target: "#panel-knowledge" },
       { label: "Tools", target: "#panel-tools-v4" },

@@ -364,6 +364,145 @@ body.home-active .topbar-right .pill-btn {
   width: 100%;
 }
 
+body.maintenance-mode {
+  background: radial-gradient(circle at 14% 15%, #262f44 0%, #131a2b 40%, #090d17 100%);
+  color: #f4f6fb;
+}
+
+body.maintenance-mode .grain {
+  opacity: 0.22;
+}
+
+.maintenance-wrap {
+  min-height: 100vh;
+  padding: clamp(1rem, 3vw, 2rem);
+  display: grid;
+  place-items: center;
+}
+
+.maintenance-glow {
+  position: fixed;
+  width: min(58vw, 760px);
+  height: min(58vw, 760px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(122, 163, 255, 0.32) 0%, rgba(122, 163, 255, 0.08) 38%, transparent 72%);
+  filter: blur(10px);
+  animation: maintenancePulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.maintenance-card {
+  position: relative;
+  z-index: 2;
+  width: min(980px, 100%);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 24px;
+  background: rgba(10, 16, 31, 0.72);
+  backdrop-filter: blur(8px);
+  padding: clamp(1rem, 2.2vw, 1.8rem);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  display: grid;
+  gap: 0.8rem;
+}
+
+.maintenance-tag {
+  margin: 0;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(207, 224, 255, 0.86);
+}
+
+.maintenance-card h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4.4vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.maintenance-card > p {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.4vw, 1.08rem);
+  line-height: 1.5;
+  color: rgba(237, 242, 255, 0.86);
+}
+
+.maintenance-visual {
+  margin: 0.4rem 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.maintenance-visual img {
+  width: 100%;
+  display: block;
+  aspect-ratio: 16 / 7;
+  object-fit: cover;
+  filter: contrast(1.06) saturate(1.03);
+}
+
+.maintenance-game-card {
+  margin-top: 0.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  background: rgba(6, 10, 19, 0.68);
+  padding: clamp(0.7rem, 1.8vw, 1rem);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.maintenance-game-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.maintenance-game-head h2 {
+  margin: 0;
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.maintenance-reset {
+  min-height: 34px;
+  font-size: 0.74rem;
+}
+
+.maintenance-game-canvas {
+  width: 100%;
+  height: min(50vh, 380px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 14px;
+  background: #111723;
+  touch-action: none;
+}
+
+.maintenance-game-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.maintenance-game-stats span {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  padding: 0.34rem 0.7rem;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+}
+
+.maintenance-game-hint {
+  margin: 0;
+  font-size: 0.84rem;
+  color: rgba(226, 236, 255, 0.86);
+}
+
 .motion-panel {
   position: relative;
   min-height: 100vh;
@@ -1261,6 +1400,12 @@ body.home-active .progress-dots {
   100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
+@keyframes maintenancePulse {
+  0% { transform: scale(0.92); opacity: 0.62; }
+  50% { transform: scale(1.03); opacity: 0.95; }
+  100% { transform: scale(0.92); opacity: 0.62; }
+}
+
 @media (max-width: 1100px) {
   .cards-track {
     grid-template-columns: 1fr;
@@ -1370,6 +1515,28 @@ body.home-active .progress-dots {
   .overlay-foot {
     flex-direction: column;
     font-size: 0.66rem;
+  }
+
+  .maintenance-wrap {
+    padding: 0.72rem;
+  }
+
+  .maintenance-card {
+    border-radius: 16px;
+    padding: 0.85rem;
+  }
+
+  .maintenance-game-card {
+    padding: 0.65rem;
+  }
+
+  .maintenance-game-canvas {
+    height: 320px;
+  }
+
+  .maintenance-game-stats span {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.55rem;
   }
 
   .motion-panel {

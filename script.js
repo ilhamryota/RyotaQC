@@ -548,6 +548,334 @@ const renderFooter = () => {
   `;
 };
 
+const renderMaintenanceMode = () => {
+  const maintenance = cfg.site?.maintenance || {};
+
+  document.body.classList.add("maintenance-mode");
+
+  const topbar = q("#topbar");
+  const progress = q("#progress-dots");
+  const app = q("#app");
+  const footer = q("#site-footer");
+
+  if (topbar) {
+    topbar.innerHTML = "";
+  }
+
+  if (progress) {
+    progress.innerHTML = "";
+    progress.style.display = "none";
+  }
+
+  if (footer) {
+    footer.innerHTML = `
+      <span>${cfg.site.title}</span>
+      <span>Maintenance Mode</span>
+    `;
+  }
+
+  if (!app) {
+    return;
+  }
+
+  app.innerHTML = `
+    <section class="maintenance-wrap">
+      <div class="maintenance-glow" aria-hidden="true"></div>
+      <article class="maintenance-card">
+        <p class="maintenance-tag">maintenance mode</p>
+        <h1>${maintenance.title || "Website Sedang Dalam Tahap Pengembangan"}</h1>
+        <p>${maintenance.message || "Website sedang maintenance untuk update fitur terbaru."}</p>
+        <figure class="maintenance-visual">
+          <img src="${maintenance.image || "assets/images/step-maintenance-repair.webp"}" alt="${maintenance.imageAlt || "Ilustrasi maintenance"}" loading="lazy" />
+        </figure>
+
+        <section class="maintenance-game-card">
+          <div class="maintenance-game-head">
+            <h2>${maintenance.gameTitle || "Tap Tap Shoot Basketball"}</h2>
+            <button class="pill-btn maintenance-reset" type="button" data-game-reset>Reset</button>
+          </div>
+          <canvas id="maintenance-game-canvas" class="maintenance-game-canvas" aria-label="Mini game basket"></canvas>
+          <div class="maintenance-game-stats">
+            <span data-game-score>Score: 0</span>
+            <span data-game-shots>Shots: 0</span>
+            <span data-game-best>Best: 0</span>
+          </div>
+          <p class="maintenance-game-hint">Tap / klik area game untuk lempar bola ke ring. Bisa dimainkan di desktop dan mobile.</p>
+        </section>
+      </article>
+    </section>
+  `;
+
+  setupMaintenanceGame();
+};
+
+const setupMaintenanceGame = () => {
+  const canvas = q("#maintenance-game-canvas");
+  if (!canvas) {
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return;
+  }
+
+  const scoreEl = q("[data-game-score]");
+  const shotsEl = q("[data-game-shots]");
+  const bestEl = q("[data-game-best]");
+  const resetBtn = q("[data-game-reset]");
+
+  const state = {
+    score: 0,
+    shots: 0,
+    best: 0
+  };
+
+  const rim = {
+    x: 0,
+    y: 0,
+    width: 96,
+    height: 10,
+    dir: 1,
+    speed: 1.7
+  };
+
+  const ball = {
+    x: 0,
+    y: 0,
+    prevY: 0,
+    vx: 0,
+    vy: 0,
+    r: 14,
+    active: false,
+    scored: false
+  };
+
+  let width = 0;
+  let height = 0;
+  let pendingReset = null;
+
+  const updateStats = () => {
+    if (scoreEl) scoreEl.textContent = `Score: ${state.score}`;
+    if (shotsEl) shotsEl.textContent = `Shots: ${state.shots}`;
+    if (bestEl) bestEl.textContent = `Best: ${state.best}`;
+  };
+
+  const resetBall = () => {
+    ball.x = width * 0.5;
+    ball.y = height - 30;
+    ball.prevY = ball.y;
+    ball.vx = 0;
+    ball.vy = 0;
+    ball.active = false;
+    ball.scored = false;
+  };
+
+  const resize = () => {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      return;
+    }
+
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    width = rect.width;
+    height = rect.height;
+
+    rim.y = Math.max(64, height * 0.24);
+    rim.width = Math.min(130, Math.max(86, width * 0.23));
+    rim.x = clamp(width * 0.58, 20, width - rim.width - 20);
+
+    resetBall();
+  };
+
+  const drawCourt = () => {
+    const bg = ctx.createLinearGradient(0, 0, 0, height);
+    bg.addColorStop(0, "#202531");
+    bg.addColorStop(1, "#11151e");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(width * 0.5, height + 40, width * 0.55, Math.PI, Math.PI * 2);
+    ctx.stroke();
+  };
+
+  const drawHoop = () => {
+    const boardX = rim.x + rim.width + 8;
+    const boardY = rim.y - 32;
+
+    ctx.fillStyle = "#f5f5f5";
+    ctx.fillRect(boardX, boardY, 10, 72);
+
+    ctx.strokeStyle = "#ff8b26";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(rim.x, rim.y);
+    ctx.lineTo(rim.x + rim.width, rim.y);
+    ctx.stroke();
+  };
+
+  const drawBall = () => {
+    ctx.fillStyle = "#f1882d";
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(35,24,14,0.65)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r * 0.72, -Math.PI / 2, Math.PI / 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r * 0.72, Math.PI / 2, Math.PI * 1.5);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(ball.x - ball.r, ball.y);
+    ctx.lineTo(ball.x + ball.r, ball.y);
+    ctx.stroke();
+  };
+
+  const circlePointHit = (cx, cy, cr, px, py, pr) => {
+    const dx = px - cx;
+    const dy = py - cy;
+    const dist = Math.hypot(dx, dy);
+    const overlap = cr + pr - dist;
+    if (overlap > 0 && dist > 0) {
+      const nx = dx / dist;
+      const ny = dy / dist;
+      ball.x += nx * overlap;
+      ball.y += ny * overlap;
+      const dot = ball.vx * nx + ball.vy * ny;
+      if (dot < 0) {
+        ball.vx -= 1.85 * dot * nx;
+        ball.vy -= 1.85 * dot * ny;
+      }
+    }
+  };
+
+  const shootTo = (targetX, targetY) => {
+    if (ball.active) {
+      return;
+    }
+
+    if (pendingReset) {
+      clearTimeout(pendingReset);
+      pendingReset = null;
+    }
+
+    const startX = width * 0.5;
+    const startY = height - 30;
+    const dx = targetX - startX;
+    const dy = Math.min(targetY - startY, -28);
+    const distance = Math.max(1, Math.hypot(dx, dy));
+
+    ball.x = startX;
+    ball.y = startY;
+    ball.prevY = startY;
+    ball.vx = (dx / distance) * 10.8;
+    ball.vy = (dy / distance) * 10.8;
+    ball.active = true;
+    ball.scored = false;
+
+    state.shots += 1;
+    updateStats();
+  };
+
+  const onPointerDown = (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    shootTo(x, y);
+  };
+
+  const onReset = () => {
+    if (pendingReset) {
+      clearTimeout(pendingReset);
+      pendingReset = null;
+    }
+    state.score = 0;
+    state.shots = 0;
+    updateStats();
+    resetBall();
+  };
+
+  const tick = () => {
+    drawCourt();
+
+    rim.x += rim.dir * rim.speed;
+    if (rim.x < 18 || rim.x + rim.width > width - 38) {
+      rim.dir *= -1;
+    }
+
+    if (ball.active) {
+      ball.prevY = ball.y;
+      ball.vy += 0.34;
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+      ball.vx *= 0.994;
+
+      if (ball.x - ball.r < 0) {
+        ball.x = ball.r;
+        ball.vx *= -0.78;
+      } else if (ball.x + ball.r > width) {
+        ball.x = width - ball.r;
+        ball.vx *= -0.78;
+      }
+
+      if (ball.y - ball.r < 0) {
+        ball.y = ball.r;
+        ball.vy *= -0.72;
+      }
+
+      const rimY = rim.y;
+      const rimInnerLeft = rim.x + 12;
+      const rimInnerRight = rim.x + rim.width - 12;
+
+      circlePointHit(rim.x + 4, rimY, 6, ball.x, ball.y, ball.r);
+      circlePointHit(rim.x + rim.width - 4, rimY, 6, ball.x, ball.y, ball.r);
+
+      if (!ball.scored && ball.prevY + ball.r <= rimY && ball.y + ball.r >= rimY && ball.x > rimInnerLeft && ball.x < rimInnerRight && ball.vy > 0) {
+        ball.scored = true;
+        state.score += 1;
+        state.best = Math.max(state.best, state.score);
+        updateStats();
+      }
+
+      if (ball.y + ball.r > height - 6) {
+        ball.y = height - 6 - ball.r;
+        ball.vy *= -0.56;
+        ball.vx *= 0.9;
+        if (Math.abs(ball.vy) < 1.2) {
+          ball.active = false;
+          pendingReset = setTimeout(() => {
+            resetBall();
+            pendingReset = null;
+          }, 360);
+        }
+      }
+    }
+
+    drawHoop();
+    drawBall();
+
+    requestAnimationFrame(tick);
+  };
+
+  canvas.addEventListener("pointerdown", onPointerDown);
+  resetBtn?.addEventListener("click", onReset);
+  window.addEventListener("resize", resize);
+
+  resize();
+  updateStats();
+  requestAnimationFrame(tick);
+};
+
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 const asInt = (value, fallback = 0) => {
@@ -1044,6 +1372,11 @@ const setupMouseParallax = () => {
 };
 
 const init = () => {
+  if (cfg.site?.maintenance?.enabled) {
+    renderMaintenanceMode();
+    return;
+  }
+
   setupCustomCursor();
   createTopbar();
   createOverlayMenu();
