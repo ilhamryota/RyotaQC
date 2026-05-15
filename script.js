@@ -610,6 +610,7 @@ const getMaintenanceDevContext = () => {
   const storageKey = dev.storageKey || "ryotaqc_dev_access";
   const viewStorageKey = `${storageKey}_view`;
   const token = dev.token || "";
+  const defaultUnlockedView = dev.defaultUnlockedView === "maintenance" ? "maintenance" : "site";
 
   const url = new URL(window.location.href);
 
@@ -679,7 +680,11 @@ const getMaintenanceDevContext = () => {
     url.searchParams.delete(viewParam);
   }
 
-  const devView = getSession(viewStorageKey) || "maintenance";
+  if (canBypass && !getSession(viewStorageKey)) {
+    setSession(viewStorageKey, defaultUnlockedView);
+  }
+
+  const devView = canBypass ? getSession(viewStorageKey) || defaultUnlockedView : "maintenance";
   const showNormalSite = canBypass && devView === "site";
 
   const cleanUrl = `${url.pathname}${url.search}${url.hash}`;
@@ -690,6 +695,9 @@ const getMaintenanceDevContext = () => {
   return {
     canBypass,
     showNormalSite,
+    showSiteDock: dev.showSiteDock !== false,
+    siteDockLabel: dev.siteDockLabel || "Site",
+    maintenanceDockLabel: dev.maintenanceDockLabel || "Maintenance",
     goSiteLabel: dev.goSiteLabel || "Go Site",
     backLabel: dev.backLabel || "Back Maintenance",
     setView: (mode) => {
@@ -780,6 +788,30 @@ const renderMaintenanceMode = (devContext = { canBypass: false, showNormalSite: 
   }
 
   setupMaintenanceGame();
+};
+
+const renderDeveloperSiteDock = (devContext = { canBypass: false, showNormalSite: false }) => {
+  q(".dev-site-dock")?.remove();
+
+  const maintenanceEnabled = Boolean(cfg.site?.maintenance?.enabled);
+  if (!maintenanceEnabled || !devContext.canBypass || !devContext.showNormalSite || !devContext.showSiteDock) {
+    return;
+  }
+
+  const dock = document.createElement("aside");
+  dock.className = "dev-site-dock";
+  dock.innerHTML = `
+    <span>Developer Mode</span>
+    <div class="dev-site-dock-actions">
+      <button class="pill-btn active" type="button" data-dev-mode-site>${devContext.siteDockLabel}</button>
+      <button class="pill-btn" type="button" data-dev-mode-maintenance>${devContext.maintenanceDockLabel}</button>
+    </div>
+  `;
+
+  dock.querySelector("[data-dev-mode-site]")?.addEventListener("click", () => devContext.setView("site"));
+  dock.querySelector("[data-dev-mode-maintenance]")?.addEventListener("click", () => devContext.setView("maintenance"));
+
+  document.body.appendChild(dock);
 };
 
 const setupMaintenanceGame = () => {
@@ -1555,6 +1587,7 @@ const init = () => {
 
   if (cfg.site?.homeEmbed?.enabled) {
     renderExternalHome();
+    renderDeveloperSiteDock(devContext);
     return;
   }
 
@@ -1571,6 +1604,7 @@ const init = () => {
   setupPanelSwitchButtons();
   setupGsapMotion();
   setupMouseParallax();
+  renderDeveloperSiteDock(devContext);
 };
 
 init();

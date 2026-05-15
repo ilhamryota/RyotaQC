@@ -31,6 +31,11 @@ window.RYOTAQC_CONTENT = {
         storageKey: "ryotaqc_dev_access",
         logoutParam: "dev_logout",
         allowLocalhost: true,
+        // defaultUnlockedView: "site" atau "maintenance"
+        defaultUnlockedView: "site",
+        showSiteDock: true,
+        siteDockLabel: "Site",
+        maintenanceDockLabel: "Maintenance",
         goSiteLabel: "Go Site",
         backLabel: "Back Maintenance"
       }

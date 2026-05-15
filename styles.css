@@ -452,6 +452,46 @@ body.maintenance-mode .grain {
   border-color: rgba(255, 255, 255, 0.58);
 }
 
+.dev-site-dock {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  background: rgba(9, 11, 16, 0.82);
+  backdrop-filter: blur(6px);
+  padding: 0.45rem 0.5rem 0.45rem 0.8rem;
+}
+
+.dev-site-dock span {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(244, 247, 255, 0.92);
+}
+
+.dev-site-dock-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dev-site-dock .pill-btn {
+  min-height: 32px;
+  padding-inline: 0.75rem;
+  font-size: 0.72rem;
+}
+
+.dev-site-dock .pill-btn.active {
+  border-color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.96);
+  color: #06080d;
+}
+
 .maintenance-tag {
   margin: 0;
   font-size: 0.76rem;
@@ -1607,6 +1647,26 @@ body.home-active .progress-dots {
   .maintenance-game-stats span {
     font-size: 0.72rem;
     padding: 0.3rem 0.55rem;
+  }
+
+  .dev-site-dock {
+    top: auto;
+    left: 0.72rem;
+    right: 0.72rem;
+    bottom: 0.72rem;
+    border-radius: 14px;
+    justify-content: space-between;
+    padding: 0.45rem 0.48rem 0.45rem 0.6rem;
+  }
+
+  .dev-site-dock span {
+    font-size: 0.64rem;
+  }
+
+  .dev-site-dock .pill-btn {
+    min-height: 30px;
+    font-size: 0.68rem;
+    padding-inline: 0.62rem;
   }
 
   .motion-panel {
