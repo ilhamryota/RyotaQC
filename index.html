@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RyotaQC - Panduan QC & Maintenance Laptop</title>
+  <meta name="description" content="Panduan lengkap Running Test, Battery QC, Maintenance 4 langkah, dan link resmi driver vendor laptop." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-noise" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#top">RyotaQC</a>
+    <nav>
+      <a href="#sop">SOP</a>
+      <a href="#battery">Battery</a>
+      <a href="#maintenance">Maintenance</a>
+      <a href="#driver-links">Driver Resmi</a>
+      <a href="#tools-v4">Tools V4</a>
+      <a href="#download">PDF</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero reveal">
+      <div>
+        <p class="eyebrow">Panduan QC & Maintenance Laptop</p>
+        <h1>Tutorial Lengkap Running Test Jam Video + Problem Solving Battery</h1>
+        <p class="lead">Sebelum belajar dan praktik, <strong>ucapkan Bismillah</strong> agar ilmu yang dipelajari menjadi berkah dan bermanfaat. Niat menjadi fondasi setiap amal (HR. Bukhari no. 1, Muslim no. 1907), dan Allah meninggikan derajat orang berilmu (QS. Al-Mujadilah 58:11).</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#sop">Mulai SOP</a>
+          <a class="btn btn-outline" href="output/Tutorial-QC-RyotaQC.pdf" target="_blank" rel="noopener">Buka PDF</a>
+        </div>
+      </div>
+      <figure class="hero-media scroll-float" data-speed="0.1">
+        <img src="assets/images/step-maintenance-repair.webp" alt="Ilustrasi teknisi melakukan perawatan laptop" loading="lazy" />
+      </figure>
+    </section>
+
+    <section class="quick-grid reveal">
+      <article class="card">
+        <h2>Set Awal Running Test</h2>
+        <ul>
+          <li>Brightness 30% untuk layar 250 nits.</li>
+          <li>Jika panel 300-400 nits: turunkan brightness ke 20%.</li>
+          <li>Audio 30%.</li>
+          <li>Battery wajib 100% sebelum test dimulai.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Cara Hitung Jam</h2>
+        <p>Patokan utama dimulai dari <strong>angka jam awal</strong>, bukan menunggu menit/detik pas. Setelah test selesai, lakukan normalisasi sesuai tabel SOP di bawah.</p>
+      </article>
+      <article class="card">
+        <h2>Standar Waspada</h2>
+        <p>Jika hasil mentah hanya 2 jam atau kurang, lanjutkan langsung ke tahap <strong>Maintenance & Problem Solving</strong> (Langkah 1-4).</p>
+        <p class="small-note">Setiap ada update resmi OEM, lakukan full update terstruktur: BIOS/firmware, chipset, power management, lalu validasi ulang running test.</p>
+      </article>
+    </section>
+
+    <section id="sop" class="section reveal">
+      <div class="section-head">
+        <p class="eyebrow">1. SOP Running Test Jam Video</p>
+        <h2>Normalisasi Durasi Hasil Test</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Hasil Mentah Running Test</th>
+              <th>Aturan Koreksi</th>
+              <th>Hasil QC Final</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2 jam</td>
+              <td>Lanjut Maintenance</td>
+              <td>Belum lolos, proses langkah 1-4</td>
+            </tr>
+            <tr>
+              <td>3 jam 30 menit</td>
+              <td>Kurangi 30 menit</td>
+              <td>3 jam 00 menit</td>
+            </tr>
+            <tr>
+              <td>3 jam 10 menit</td>
+              <td>Kurangi 30 menit</td>
+              <td>2 jam 40 menit</td>
+            </tr>
+            <tr>
+              <td>4 jam 45 menit</td>
+              <td>Kurangi 45 menit</td>
+              <td>4 jam 00 menit</td>
+            </tr>
+            <tr>
+              <td>5 jam 20 menit</td>
+              <td>Kurangi 1 jam</td>
+              <td>4 jam 20 menit</td>
+            </tr>
+            <tr>
+              <td>6 jam 13 menit</td>
+              <td>Kurangi 1 jam</td>
+              <td>5 jam 13 menit</td>
+            </tr>
+            <tr>
+              <td>7 jam 32 menit</td>
+              <td>Kurangi 2 jam</td>
+              <td>5 jam 32 menit</td>
+            </tr>
+            <tr>
+              <td>8 jam 53 menit</td>
+              <td>Kurangi 2 jam</td>
+              <td>6 jam 53 menit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="calc card">
+        <h3>Kalkulator Normalisasi Running Test</h3>
+        <form id="running-test-form">
+          <label>
+            Jam Mentah
+            <input id="input-hours" type="number" min="0" max="99" value="3" required />
+          </label>
+          <label>
+            Menit Mentah
+            <input id="input-minutes" type="number" min="0" max="59" value="30" required />
+          </label>
+          <button type="submit" class="btn btn-primary">Hitung</button>
+        </form>
+        <p id="calc-output" class="calc-output">Masukkan durasi untuk melihat hasil QC final.</p>
+      </div>
+    </section>
+
+    <section id="battery" class="section reveal">
+      <div class="section-head">
+        <p class="eyebrow">2. Battery</p>
+        <h2>Aturan Lolos / Tidak Lolos QC Battery</h2>
+      </div>
+
+      <div class="split">
+        <article class="card">
+          <h3>Kondisi Wajib Ganti Battery</h3>
+          <ul>
+            <li>Battery Health (BH) di bawah 60%.</li>
+            <li>FCC di bawah 30.000 mWh.</li>
+            <li>Hasil running test di bawah 2 jam.</li>
+          </ul>
+          <p>Jika tiga kondisi ini terjadi bersamaan, battery dianggap sudah aus dan tidak optimal untuk pemakaian jangka panjang.</p>
+        </article>
+
+        <article class="card">
+          <h3>Pengecualian (Boleh Dipertimbangkan)</h3>
+          <ul>
+            <li>BH &lt; 60% tetapi FCC masih di atas 30.000 mWh.</li>
+            <li>Hasil running test nyata di atas 2 jam.</li>
+          </ul>
+          <p>Unit boleh lanjut dengan catatan khusus QC dan edukasi ke user bahwa performa battery sudah menurun.</p>
+        </article>
+      </div>
+
+      <figure class="image-card reveal">
+        <img src="assets/images/windows11-settings.png" alt="Contoh tampilan Windows untuk pengecekan status sistem" loading="lazy" class="scroll-float" data-speed="0.08" />
+        <figcaption>Contoh tampilan sistem saat validasi kondisi unit sebelum dan sesudah maintenance.</figcaption>
+      </figure>
+    </section>
+
+    <section id="maintenance" class="section reveal">
+      <div class="section-head">
+        <p class="eyebrow">Maintenance & Problem Solving</p>
+        <h2>Langkah 1 sampai 4 (Wajib Berurutan)</h2>
+      </div>
+
+      <div class="timeline">
+        <article class="timeline-item reveal">
+          <h3>Langkah 1 - Update Firmware & Power Management</h3>
+          <p>Lakukan update BIOS/firmware, chipset, power management, dan aplikasi update resmi OEM. Tujuan: memastikan kontrol daya dan komunikasi sensor battery berjalan stabil.</p>
+          <img src="assets/images/windows-update-screen.png" alt="Contoh layar update sistem" loading="lazy" class="scroll-float" data-speed="0.06" />
+          <p class="small-note">Catatan: lakukan restart setelah update besar BIOS/firmware.</p>
+        </article>
+
+        <article class="timeline-item reveal">
+          <h3>Langkah 2 - Kalibrasi Battery</h3>
+          <ol>
+            <li>Selesaikan langkah 1 terlebih dahulu.</li>
+            <li>Pakai laptop sampai battery 0% (auto shutdown).</li>
+            <li>Dalam kondisi mati, charge sampai 100% tanpa interupsi.</li>
+            <li>Jalankan ulang Running Test dan bandingkan hasil sebelum/sesudah update.</li>
+          </ol>
+          <p>Jika hasil membaik, unit bisa lanjut QC. Jika tetap sama/lebih jelek, lanjut langkah 3.</p>
+          <img src="assets/images/battery-minimal.svg" alt="Ilustrasi kalibrasi battery hingga penuh kembali" loading="lazy" class="scroll-float" data-speed="0.05" />
+        </article>
+
+        <article class="timeline-item reveal">
+          <h3>Langkah 3 - Install Ulang OS Sesuai Dukungan Driver</h3>
+          <p>Jika unit pakai Windows 11, pastikan perangkat <strong>benar-benar kompatibel</strong> dan driver tersedia penuh. Gunakan cek kompatibilitas resmi Microsoft dan OEM:</p>
+          <ul>
+            <li><a href="https://support.microsoft.com/en-us/windows/how-to-use-the-pc-health-check-app-9c8abd9b-03ba-4e67-81ef-36f37caa7844" target="_blank" rel="noopener">PC Health Check (Microsoft)</a></li>
+            <li><a href="https://www.microsoft.com/en-us/windows/windows-11-specifications" target="_blank" rel="noopener">Windows 11 System Requirements</a></li>
+          </ul>
+          <p>Jika unit mentok di Windows 10, jangan dipaksakan ke Windows 11. Driver lintas versi sering menyebabkan bug, performa battery tidak optimal, dan troubleshooting jadi lebih sulit.</p>
+          <img src="assets/images/windows11-settings.png" alt="Contoh lingkungan Windows 11 untuk validasi kompatibilitas driver" loading="lazy" class="scroll-float" data-speed="0.05" />
+          <div class="status-sample">
+            <div class="badge critical">Critical</div>
+            <div class="badge recommended">Recommended</div>
+            <p>Prioritaskan paket driver/firmware yang statusnya <strong>Recommended</strong> dan resmi dari vendor perangkat.</p>
+          </div>
+        </article>
+
+        <article class="timeline-item reveal">
+          <h3>Langkah 4 - Turunkan 1 Versi OS Jika Masih Gagal</h3>
+          <ul>
+            <li>Windows 11 -> Windows 10</li>
+            <li>Windows 10 -> Windows 8 (khusus unit lama yang memang dukungan drivernya di sana)</li>
+          </ul>
+          <p>Setelah install ulang versi lebih rendah, lakukan full update resmi lalu Running Test ulang.</p>
+          <p><strong>Jika hasil tetap 2 jam atau kurang:</strong> battery wajib diganti karena kondisi usia pakai sudah tidak layak untuk pemakaian jangka panjang.</p>
+          <img src="assets/images/windows8-update-screen.png" alt="Contoh update system pada Windows versi lama" loading="lazy" class="scroll-float" data-speed="0.04" />
+        </article>
+      </div>
+    </section>
+
+    <section id="driver-links" class="section reveal">
+      <div class="section-head">
+        <p class="eyebrow">Link Resmi Driver OEM</p>
+        <h2>Direct ke Sumber Official (Lenovo, Dell, HP, ASUS, Toshiba/Dynabook, Fujitsu)</h2>
+      </div>
+
+      <div class="driver-grid">
+        <article class="driver-card">
+          <h3>Lenovo</h3>
+          <p>Utama: Lenovo Vantage, Lenovo System Update (desktop/notebook/workstation).</p>
+          <a href="https://support.lenovo.com/" target="_blank" rel="noopener">Lenovo Support</a>
+          <a href="https://support.lenovo.com/us/en/downloads/ds012808-lenovo-system-update-for-windows-10-7-32-bit-64-bit-desktop-notebook-workstation" target="_blank" rel="noopener">Lenovo System Update</a>
+          <a href="https://support.lenovo.com/uu/en/solutions/HT505081" target="_blank" rel="noopener">Lenovo Vantage</a>
+        </article>
+
+        <article class="driver-card">
+          <h3>Dell</h3>
+          <p>Consumer: SupportAssist. Commercial: Dell Command | Update.</p>
+          <a href="https://www.dell.com/support/home/en-us/drivers" target="_blank" rel="noopener">Dell Drivers & Downloads</a>
+          <a href="https://www.dell.com/support/kbdoc/en-us/000177325/dell-command-update" target="_blank" rel="noopener">Dell Command | Update</a>
+          <a href="https://www.dell.com/support/contents/en-us/article/product-support/self-support-knowledgebase/software-and-downloads/supportassist" target="_blank" rel="noopener">SupportAssist for Home PCs</a>
+        </article>
+
+        <article class="driver-card">
+          <h3>HP</h3>
+          <p>Consumer: HP Support Assistant. Business: HP Image Assistant (HPIA).</p>
+          <a href="https://support.hp.com/us-en/drivers" target="_blank" rel="noopener">HP Drivers</a>
+          <a href="https://support.hp.com/us-en/help/hp-support-assistant" target="_blank" rel="noopener">HP Support Assistant</a>
+          <a href="https://support.hp.com/us-en/document/ish_7636709-7636753-16" target="_blank" rel="noopener">HP Image Assistant (HPIA)</a>
+        </article>
+
+        <article class="driver-card">
+          <h3>ASUS</h3>
+          <p>Utama: MyASUS - System Update. ASUS Live Update sudah EOL dan hanya legacy.</p>
+          <a href="https://www.asus.com/support/download-center/" target="_blank" rel="noopener">ASUS Download Center</a>
+          <a href="https://www.asus.com/us/support/faq/1051729/" target="_blank" rel="noopener">MyASUS - System Update</a>
+          <a href="https://www.asus.com/us/support/faq/1018727/" target="_blank" rel="noopener">Status ASUS Live Update</a>
+        </article>
+
+        <article class="driver-card">
+          <h3>Toshiba / Dynabook</h3>
+          <p>Gunakan portal Dynabook Support untuk driver, BIOS, dan utilities resmi.</p>
+          <a href="https://support.dynabook.com/support/driversResults" target="_blank" rel="noopener">Dynabook Drivers & Software</a>
+          <a href="https://support.dynabook.com/support/viewContentDetail?contentId=4016624" target="_blank" rel="noopener">Dynabook Service Station</a>
+        </article>
+
+        <article class="driver-card">
+          <h3>Fujitsu</h3>
+          <p>Tool otomatis resmi: DeskUpdate (driver, utility, BIOS).</p>
+          <a href="https://download.ts.fujitsu.com/deskupdate/index.asp?lng=en" target="_blank" rel="noopener">Fujitsu DeskUpdate</a>
+          <a href="https://support.ts.fujitsu.com/Softwarelist0.htm" target="_blank" rel="noopener">Fujitsu Support Downloads</a>
+        </article>
+      </div>
+
+      <p class="small-note">Catatan versi OS: Microsoft menyatakan dukungan Windows 10 berakhir pada <strong>14 Oktober 2025</strong>. Jika unit tidak kompatibel Windows 11, lakukan penilaian teknis dan kebijakan penggunaan internal sebelum finalisasi unit.</p>
+    </section>
+
+    <section id="tools-v4" class="section reveal">
+      <div class="section-head">
+        <p class="eyebrow">Integrasi Tools</p>
+        <h2>Varian Update RyotaQC V4 (D:\QCApps\RyotaQC-V4)</h2>
+      </div>
+
+      <div class="split">
+        <article class="card">
+          <h3>Fungsi Utama yang Relevan ke SOP</h3>
+          <ul>
+            <li>Launcher QC: CPU Test, HWiNFO, Battery Health, Sentinel, Benchmark.</li>
+            <li>Running Test otomatis buka video test via VLC fullscreen.</li>
+            <li>Generator Battery Report (`powercfg /batteryreport`).</li>
+            <li>Tool-map vendor driver untuk Lenovo, Dell, HP.</li>
+            <li>Log tersimpan untuk audit QC.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Kaitan Langsung dengan Materi</h3>
+          <ul>
+            <li>Mendukung verifikasi hasil running test jam video.</li>
+            <li>Mempercepat validasi FCC/Battery Health sebelum keputusan ganti battery.</li>
+            <li>Membantu alur maintenance langkah 1 (update software/driver resmi).</li>
+            <li>Memudahkan dokumentasi hasil sebelum dan sesudah tindakan.</li>
+          </ul>
+        </article>
+      </div>
+
+      <figure class="image-card">
+        <img src="assets/images/technician-illustration.svg" alt="Ilustrasi teknisi komputer" loading="lazy" class="scroll-float" data-speed="0.09" />
+        <figcaption>Ilustrasi teknisi sebagai pengingat bahwa setiap keputusan QC harus berbasis data test, bukan asumsi.</figcaption>
+      </figure>
+    </section>
+
+    <section id="download" class="section reveal">
+      <div class="section-head">
+        <p class="eyebrow">Dokumen</p>
+        <h2>Unduh File PDF Panduan</h2>
+      </div>
+      <div class="card">
+        <p>File PDF sudah disiapkan dari materi ini, termasuk langkah SOP, tabel normalisasi, dan link driver resmi.</p>
+        <a class="btn btn-primary" href="output/Tutorial-QC-RyotaQC.pdf" target="_blank" rel="noopener">Buka / Unduh PDF</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Credit Dokumen dibuat oleh <strong>RyotaQC</strong> sebagai panduan QC & Maintenance Laptop.</p>
+    <p class="small-note">Sumber gambar free-license dan referensi resmi vendor tercantum di <a href="docs/sumber-gambar.md" target="_blank" rel="noopener">docs/sumber-gambar.md</a>.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

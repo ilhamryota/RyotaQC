@@ -1,0 +1,391 @@
+:root {
+  --bg: #f7f8f3;
+  --surface: #ffffff;
+  --ink: #13201b;
+  --muted: #4d5f58;
+  --line: #d7dfd9;
+  --brand: #0f766e;
+  --brand-2: #f59e0b;
+  --critical: #b42318;
+  --recommended: #047857;
+  --radius: 20px;
+  --shadow: 0 20px 45px rgba(16, 28, 23, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 95% -10%, rgba(245, 158, 11, 0.18), transparent 60%),
+              radial-gradient(950px 500px at -15% 8%, rgba(15, 118, 110, 0.18), transparent 55%),
+              var(--bg);
+  color: var(--ink);
+  font-family: "Space Grotesk", sans-serif;
+  line-height: 1.65;
+}
+
+.page-noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.2;
+  background-image: radial-gradient(rgba(0,0,0,0.04) 0.45px, transparent 0.45px);
+  background-size: 5px 5px;
+  z-index: -1;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+h1,
+h2 {
+  font-family: "Merriweather", serif;
+}
+
+p,
+ul,
+ol {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: inherit;
+}
+
+main,
+footer {
+  width: min(1140px, 92vw);
+  margin-inline: auto;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 4vw;
+  border-bottom: 1px solid rgba(18, 37, 30, 0.12);
+  background: rgba(247, 248, 243, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.brand {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+.topbar nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.topbar nav a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 2rem;
+  align-items: center;
+  margin-top: 3rem;
+  padding: 2rem 0;
+}
+
+.eyebrow {
+  display: inline-flex;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.hero h1 {
+  font-size: clamp(1.9rem, 3.8vw, 3.1rem);
+  margin-top: 0.35rem;
+}
+
+.lead {
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+
+.hero-media {
+  margin: 0;
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transform: rotate(-1.5deg);
+}
+
+.hero-media img,
+.image-card img,
+.timeline-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand), #0b8d84);
+  color: #f7fffd;
+}
+
+.btn-outline {
+  border-color: #b7c4be;
+  color: var(--ink);
+  background: #fff;
+}
+
+.section {
+  margin-top: 4.2rem;
+}
+
+.section-head {
+  margin-bottom: 1.2rem;
+}
+
+.quick-grid,
+.driver-grid,
+.split {
+  display: grid;
+  gap: 1rem;
+}
+
+.quick-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+.split {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.driver-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card,
+.driver-card,
+.timeline-item,
+.table-wrap,
+.image-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.card,
+.driver-card,
+.timeline-item {
+  padding: 1.1rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+}
+
+th,
+td {
+  padding: 0.8rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #edf5f2;
+  color: #19453f;
+}
+
+.calc {
+  margin-top: 1rem;
+}
+
+.calc form {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.92rem;
+}
+
+input {
+  border: 1px solid #bac9c3;
+  border-radius: 12px;
+  padding: 0.56rem 0.66rem;
+  width: 160px;
+  font: inherit;
+}
+
+.calc-output {
+  margin-top: 0.9rem;
+  padding: 0.65rem 0.8rem;
+  background: #f2f8f6;
+  border-left: 4px solid var(--brand);
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.timeline {
+  display: grid;
+  gap: 1rem;
+}
+
+.timeline-item img {
+  margin: 0.8rem 0 0.3rem;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  max-height: 330px;
+  object-fit: contain;
+  background: #f8fbfa;
+}
+
+.status-sample {
+  margin-top: 0.6rem;
+  padding: 0.9rem;
+  border-radius: 12px;
+  background: #f7faf9;
+  border: 1px dashed #b2c2bc;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: #fff;
+  margin-right: 0.45rem;
+  margin-bottom: 0.55rem;
+}
+
+.badge.critical {
+  background: var(--critical);
+}
+
+.badge.recommended {
+  background: var(--recommended);
+}
+
+.driver-card {
+  display: grid;
+  gap: 0.46rem;
+}
+
+.driver-card a {
+  color: #045c8f;
+  text-decoration: none;
+}
+
+.driver-card a:hover {
+  text-decoration: underline;
+}
+
+.image-card {
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.image-card figcaption {
+  padding: 0.6rem 0.9rem 0.9rem;
+  font-size: 0.9rem;
+  color: #3f5550;
+}
+
+.small-note {
+  font-size: 0.88rem;
+  color: #465c56;
+}
+
+footer {
+  margin-top: 4rem;
+  margin-bottom: 2rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1.2rem;
+  color: #39524a;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 650ms ease, transform 650ms ease;
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-float {
+  will-change: transform;
+  transition: transform 120ms linear;
+}
+
+@media (max-width: 980px) {
+  .hero,
+  .quick-grid,
+  .split,
+  .driver-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-media {
+    transform: none;
+  }
+
+  .topbar {
+    padding-inline: 2.2vw;
+  }
+
+  .topbar nav {
+    gap: 0.65rem;
+  }
+}
