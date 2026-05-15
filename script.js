@@ -548,7 +548,108 @@ const renderFooter = () => {
   `;
 };
 
-const renderMaintenanceMode = () => {
+const getMaintenanceDevContext = () => {
+  const maintenance = cfg.site?.maintenance || {};
+  const dev = maintenance.devAccess || {};
+  const queryParam = dev.queryParam || "dev_key";
+  const viewParam = dev.viewParam || "dev_view";
+  const logoutParam = dev.logoutParam || "dev_logout";
+  const storageKey = dev.storageKey || "ryotaqc_dev_access";
+  const viewStorageKey = `${storageKey}_view`;
+  const token = dev.token || "";
+
+  const url = new URL(window.location.href);
+
+  const setLocal = (key, value) => {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch (_err) {}
+  };
+  const getLocal = (key) => {
+    try {
+      return window.localStorage.getItem(key);
+    } catch (_err) {
+      return null;
+    }
+  };
+  const removeLocal = (key) => {
+    try {
+      window.localStorage.removeItem(key);
+    } catch (_err) {}
+  };
+  const setSession = (key, value) => {
+    try {
+      window.sessionStorage.setItem(key, value);
+    } catch (_err) {}
+  };
+  const getSession = (key) => {
+    try {
+      return window.sessionStorage.getItem(key);
+    } catch (_err) {
+      return null;
+    }
+  };
+  const removeSession = (key) => {
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch (_err) {}
+  };
+
+  if (url.searchParams.get(logoutParam) === "1") {
+    removeLocal(storageKey);
+    removeSession(viewStorageKey);
+    url.searchParams.delete(logoutParam);
+  }
+
+  let canBypass = false;
+  const isLocalHost = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname) || window.location.hostname.startsWith("127.");
+
+  if (dev.allowLocalhost && isLocalHost) {
+    canBypass = true;
+    setLocal(storageKey, "1");
+  }
+
+  const unlockValue = url.searchParams.get(queryParam);
+  if (token && unlockValue && unlockValue === token) {
+    canBypass = true;
+    setLocal(storageKey, "1");
+    url.searchParams.delete(queryParam);
+  }
+
+  if (getLocal(storageKey) === "1") {
+    canBypass = true;
+  }
+
+  const requestedView = url.searchParams.get(viewParam);
+  if (requestedView === "site" || requestedView === "maintenance") {
+    setSession(viewStorageKey, requestedView);
+    url.searchParams.delete(viewParam);
+  }
+
+  const devView = getSession(viewStorageKey) || "maintenance";
+  const showNormalSite = canBypass && devView === "site";
+
+  const cleanUrl = `${url.pathname}${url.search}${url.hash}`;
+  if (cleanUrl !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
+    window.history.replaceState({}, "", cleanUrl);
+  }
+
+  return {
+    canBypass,
+    showNormalSite,
+    goSiteLabel: dev.goSiteLabel || "Go Site",
+    backLabel: dev.backLabel || "Back Maintenance",
+    setView: (mode) => {
+      if (!canBypass) {
+        return;
+      }
+      setSession(viewStorageKey, mode);
+      window.location.reload();
+    }
+  };
+};
+
+const renderMaintenanceMode = (devContext = { canBypass: false, showNormalSite: false }) => {
   const maintenance = cfg.site?.maintenance || {};
 
   document.body.classList.add("maintenance-mode");
@@ -582,6 +683,18 @@ const renderMaintenanceMode = () => {
     <section class="maintenance-wrap">
       <div class="maintenance-glow" aria-hidden="true"></div>
       <article class="maintenance-card">
+        ${
+          devContext.canBypass
+            ? `
+          <div class="maintenance-devbar">
+            <span>Developer Mode</span>
+            <button class="pill-btn maintenance-dev-toggle" type="button" data-dev-toggle>
+              ${devContext.showNormalSite ? devContext.backLabel : devContext.goSiteLabel}
+            </button>
+          </div>
+        `
+            : ""
+        }
         <p class="maintenance-tag">maintenance mode</p>
         <h1>${maintenance.title || "Website Sedang Dalam Tahap Pengembangan"}</h1>
         <p>${maintenance.message || "Website sedang maintenance untuk update fitur terbaru."}</p>
@@ -605,6 +718,13 @@ const renderMaintenanceMode = () => {
       </article>
     </section>
   `;
+
+  if (devContext.canBypass) {
+    q("[data-dev-toggle]")?.addEventListener("click", () => {
+      const nextMode = devContext.showNormalSite ? "maintenance" : "site";
+      devContext.setView(nextMode);
+    });
+  }
 
   setupMaintenanceGame();
 };
@@ -1372,8 +1492,11 @@ const setupMouseParallax = () => {
 };
 
 const init = () => {
-  if (cfg.site?.maintenance?.enabled) {
-    renderMaintenanceMode();
+  const maintenanceEnabled = Boolean(cfg.site?.maintenance?.enabled);
+  const devContext = getMaintenanceDevContext();
+
+  if (maintenanceEnabled && !devContext.showNormalSite) {
+    renderMaintenanceMode(devContext);
     return;
   }
 
