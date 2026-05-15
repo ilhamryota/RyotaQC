@@ -548,6 +548,48 @@ const renderFooter = () => {
   `;
 };
 
+const renderExternalHome = () => {
+  const embed = cfg.site?.homeEmbed || {};
+  const embedUrl = embed.url || "https://motion.zajno.com/";
+
+  const topbar = q("#topbar");
+  const progress = q("#progress-dots");
+  const app = q("#app");
+  const footer = q("#site-footer");
+
+  document.body.classList.remove("maintenance-mode", "menu-open", "has-custom-cursor", "home-active");
+  document.body.classList.add("external-home-mode");
+
+  if (topbar) {
+    topbar.innerHTML = "";
+    topbar.style.display = "none";
+  }
+  if (progress) {
+    progress.innerHTML = "";
+    progress.style.display = "none";
+  }
+  if (footer) {
+    footer.innerHTML = "";
+    footer.style.display = "none";
+  }
+  if (!app) {
+    return;
+  }
+
+  app.innerHTML = `
+    <section class="external-home-wrap">
+      <iframe
+        class="external-home-frame"
+        src="${embedUrl}"
+        title="Motion Homepage"
+        loading="eager"
+        referrerpolicy="no-referrer-when-downgrade"
+        allow="fullscreen; autoplay"
+      ></iframe>
+    </section>
+  `;
+};
+
 const getMaintenanceDevContext = () => {
   const maintenance = cfg.site?.maintenance || {};
   const dev = maintenance.devAccess || {};
@@ -1497,6 +1539,11 @@ const init = () => {
 
   if (maintenanceEnabled && !devContext.showNormalSite) {
     renderMaintenanceMode(devContext);
+    return;
+  }
+
+  if (cfg.site?.homeEmbed?.enabled) {
+    renderExternalHome();
     return;
   }
 

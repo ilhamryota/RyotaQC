@@ -4,6 +4,13 @@ window.RYOTAQC_CONTENT = {
     brandPill: "ryotaqc",
     menuLabel: "menu",
     introTag: "SOP Battery Running Test",
+    homeEmbed: {
+      enabled: true,
+      url: "https://motion.zajno.com/",
+      fallbackTitle: "Open Motion Homepage",
+      fallbackBody: "Jika preview beranda diblokir oleh browser, buka langsung link berikut.",
+      fallbackButton: "Buka motion.zajno.com"
+    },
     maintenance: {
       // Ubah ke true untuk mengaktifkan maintenance mode.
       enabled: true,
