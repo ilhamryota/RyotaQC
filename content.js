@@ -1,3 +1,4 @@
+// Semua konten website (menu, tulisan, gambar, maintenance, homepage) dikustom dari 1 script ini.
 window.RYOTAQC_CONTENT = {
   site: {
     title: "RyotaQC",
@@ -5,7 +6,9 @@ window.RYOTAQC_CONTENT = {
     menuLabel: "menu",
     introTag: "SOP Battery Running Test",
     homeEmbed: {
-      enabled: true,
+      // Ubah ke true jika ingin beranda mengambil 100% tampilan dari link eksternal.
+      // Untuk kustomisasi tulisan/gambar dari 1 script ini, biarkan false.
+      enabled: false,
       url: "https://motion.zajno.com/",
       fallbackTitle: "Open Motion Homepage",
       fallbackBody: "Jika preview beranda diblokir oleh browser, buka langsung link berikut.",
@@ -57,7 +60,17 @@ window.RYOTAQC_CONTENT = {
       brand: "RYOTAQC",
       heroTitle: "WE'LL CREATE YOUR PERFECT QC FLOW",
       heroSub: "Start achieving your laptop QC goals. Join us today.",
-      caption: "Here, animation gives a pumping vibe to a fitness website."
+      caption: "Here, animation gives a pumping vibe to a fitness website.",
+      browserNav: ["HOME", "PRICING", "ABOUT US", "CONTACTS"],
+      browserCtaLabel: "Get in touch",
+      downloadTop: "Download this video",
+      downloadBottom: "Download audio from this page",
+      metricMainLabel: "Daily runtime burn",
+      metricMainValue: "230 bpm",
+      metricSubLabel: "Heartrate",
+      metricSubValue: "230 bpm",
+      heroImage: "",
+      heroImageAlt: "Homepage visual"
     },
     {
       id: "panel-knowledge",

@@ -180,61 +180,72 @@ const createOverlayMenu = () => {
   });
 };
 
-const renderIntro = (panel) => `
-  <section id="${panel.id}" class="motion-panel theme-${panel.theme} intro-panel home-panel" data-panel>
-    ${renderPanelMetaIcon(panel.type)}
-    <div class="home-right-dot" aria-hidden="true"></div>
-    <button class="home-sound-btn" type="button" aria-label="Toggle sound">
-      <span></span>
-    </button>
-    <article class="home-stage">
-      <p class="home-download-tag top anim-target">Download this video</p>
-      <section class="home-browser anim-target">
-        <header class="home-browser-head">
-          <span></span><span></span><span></span>
-        </header>
-        <div class="home-browser-nav">
-          <strong>${panel.brand || "RYOTAQC"}</strong>
-          <div>
-            <span>HOME</span>
-            <span>PRICING</span>
-            <span>ABOUT US</span>
-            <span>CONTACTS</span>
+const renderIntro = (panel) => {
+  const navItems = (panel.browserNav && panel.browserNav.length ? panel.browserNav : ["HOME", "PRICING", "ABOUT US", "CONTACTS"])
+    .map((item) => `<span>${item}</span>`)
+    .join("");
+
+  const visualMarkup = panel.heroImage
+    ? `
+      <figure class="home-visual-image anim-target">
+        <img src="${panel.heroImage}" alt="${panel.heroImageAlt || "Homepage visual"}" loading="lazy" />
+      </figure>
+    `
+    : `
+      <figure class="hero-athlete anim-target">
+        <span class="hero-head"></span>
+        <span class="hero-body"></span>
+        <span class="hero-arm hero-arm-left"></span>
+        <span class="hero-arm hero-arm-right"></span>
+      </figure>
+    `;
+
+  return `
+    <section id="${panel.id}" class="motion-panel theme-${panel.theme} intro-panel home-panel" data-panel>
+      ${renderPanelMetaIcon(panel.type)}
+      <div class="home-right-dot" aria-hidden="true"></div>
+      <button class="home-sound-btn" type="button" aria-label="Toggle sound">
+        <span></span>
+      </button>
+      <article class="home-stage">
+        <p class="home-download-tag top anim-target">${panel.downloadTop || "Download this video"}</p>
+        <section class="home-browser anim-target">
+          <header class="home-browser-head">
+            <span></span><span></span><span></span>
+          </header>
+          <div class="home-browser-nav">
+            <strong>${panel.brand || "RYOTAQC"}</strong>
+            <div>${navItems}</div>
+            <a href="#panel-driver">${panel.browserCtaLabel || "Get in touch"}</a>
           </div>
-          <a href="#panel-driver">Get in touch</a>
-        </div>
-        <div class="home-browser-body">
-          <article class="home-copy">
-            <h1 class="anim-target">${panel.heroTitle || "WE'LL CREATE YOUR PERFECT QC FLOW"}</h1>
-            <p class="anim-target">${panel.heroSub || "Start achieving your laptop QC goals. Join us today."}</p>
-          </article>
-          <div class="home-visual">
-            <figure class="hero-athlete anim-target">
-              <span class="hero-head"></span>
-              <span class="hero-body"></span>
-              <span class="hero-arm hero-arm-left"></span>
-              <span class="hero-arm hero-arm-right"></span>
-            </figure>
-            <aside class="home-metric black anim-target">
-              <small>Daily runtime burn</small>
-              <strong>230 bpm</strong>
-              <div>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
-            </aside>
-            <aside class="home-metric white anim-target">
-              <small>Heartrate</small>
-              <strong>230 bpm</strong>
-            </aside>
+          <div class="home-browser-body">
+            <article class="home-copy">
+              <h1 class="anim-target">${panel.heroTitle || "WE'LL CREATE YOUR PERFECT QC FLOW"}</h1>
+              <p class="anim-target">${panel.heroSub || "Start achieving your laptop QC goals. Join us today."}</p>
+            </article>
+            <div class="home-visual">
+              ${visualMarkup}
+              <aside class="home-metric black anim-target">
+                <small>${panel.metricMainLabel || "Daily runtime burn"}</small>
+                <strong>${panel.metricMainValue || "230 bpm"}</strong>
+                <div>
+                  <span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </aside>
+              <aside class="home-metric white anim-target">
+                <small>${panel.metricSubLabel || "Heartrate"}</small>
+                <strong>${panel.metricSubValue || "230 bpm"}</strong>
+              </aside>
+            </div>
           </div>
-        </div>
-        <footer class="home-browser-foot"></footer>
-      </section>
-      <p class="home-caption anim-target">${panel.caption || "Here, animation gives a pumping vibe to a fitness website."}</p>
-      <p class="home-download-tag bottom anim-target">Download audio from this page</p>
-    </article>
-  </section>
-`;
+          <footer class="home-browser-foot"></footer>
+        </section>
+        <p class="home-caption anim-target">${panel.caption || "Here, animation gives a pumping vibe to a fitness website."}</p>
+        <p class="home-download-tag bottom anim-target">${panel.downloadBottom || "Download audio from this page"}</p>
+      </article>
+    </section>
+  `;
+};
 
 const renderSplit = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme} split-panel" data-panel>
