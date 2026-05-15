@@ -58,6 +58,7 @@ const panelIconByType = {
   focus: icons.dot,
   steps: icons.spark,
   links: icons.node,
+  calculator: icons.dot,
   cta: icons.spark
 };
 
@@ -283,6 +284,94 @@ const renderLinks = (panel) => `
   </section>
 `;
 
+const renderCalculator = (panel) => `
+  <section id="${panel.id}" class="motion-panel theme-${panel.theme}" data-panel>
+    ${renderPanelMetaIcon(panel.type)}
+    <article class="calc-card">
+      <p class="panel-kicker anim-target">${panel.kicker}</p>
+      <h2 class="panel-heading anim-target">${panel.heading}</h2>
+      <p class="panel-body anim-target">${panel.body}</p>
+
+      <div class="calc-grid">
+        <section class="calc-rules anim-target">
+          <h3>Aturan Koreksi</h3>
+          <div class="calc-rule-table">
+            <div class="calc-rule-head">
+              <span>Range</span>
+              <span>Pengurang</span>
+              <span>Contoh</span>
+            </div>
+            ${panel.rules
+              .map(
+                (rule) => `
+                  <div class="calc-rule-row">
+                    <span>${rule.range}</span>
+                    <span>${rule.deduction}</span>
+                    <span>${rule.example}</span>
+                  </div>
+                `
+              )
+              .join("")}
+          </div>
+        </section>
+
+        <section class="calc-form-wrap anim-target">
+          <h3>Input Unit</h3>
+          <form class="calc-form" data-calc-form>
+            <label>
+              Jam Mentah
+              <input type="number" min="0" max="24" step="1" value="3" data-calc-input="hours" />
+            </label>
+            <label>
+              Menit Mentah
+              <input type="number" min="0" max="59" step="1" value="10" data-calc-input="minutes" />
+            </label>
+            <label>
+              Battery Health (%)
+              <input type="number" min="0" max="100" step="1" value="58" data-calc-input="bh" />
+            </label>
+            <label>
+              FCC (mWh)
+              <input type="number" min="0" max="120000" step="100" value="28000" data-calc-input="fcc" />
+            </label>
+            <button class="cta-button" type="submit">${panel.buttonLabel || "Hitung"}</button>
+          </form>
+
+          <div class="calc-results">
+            <article class="calc-result-card">
+              <p>Hasil Mentah</p>
+              <strong data-calc-result="raw">3 jam 10 menit</strong>
+            </article>
+            <article class="calc-result-card">
+              <p>Pengurang SOP</p>
+              <strong data-calc-result="deduction">30 menit</strong>
+            </article>
+            <article class="calc-result-card">
+              <p>Hasil Final QC</p>
+              <strong data-calc-result="final">2 jam 40 menit</strong>
+            </article>
+            <article class="calc-result-card">
+              <p>Tindakan Maintenance</p>
+              <strong data-calc-result="maintenance">Lanjut maintenance 1-4</strong>
+            </article>
+            <article class="calc-result-card wide">
+              <p>Rekomendasi Battery</p>
+              <strong data-calc-result="battery">Rekomendasi ganti battery (BH rendah + FCC rendah).</strong>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <section class="calc-quick-check anim-target">
+        <h3>Quick Check</h3>
+        <ul>
+          ${panel.quickChecks.map((item) => `<li>${item}</li>`).join("")}
+        </ul>
+      </section>
+    </article>
+  </section>
+`;
+
 const renderCta = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme}" data-panel>
     ${renderPanelMetaIcon(panel.type)}
@@ -306,6 +395,7 @@ const panelRenderers = {
   focus: renderFocus,
   steps: renderSteps,
   links: renderLinks,
+  calculator: renderCalculator,
   cta: renderCta
 };
 
@@ -378,6 +468,96 @@ const renderFooter = () => {
     <span>${cfg.footer.left}</span>
     <span>${cfg.footer.right}</span>
   `;
+};
+
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+const asInt = (value, fallback = 0) => {
+  const num = Number.parseInt(value, 10);
+  return Number.isNaN(num) ? fallback : num;
+};
+
+const toDurationText = (totalMinutes) => {
+  const safe = Math.max(0, totalMinutes);
+  const hours = Math.floor(safe / 60);
+  const minutes = safe % 60;
+  return `${hours} jam ${minutes} menit`;
+};
+
+const getSopDeduction = (hours) => {
+  if (hours === 3) {
+    return 30;
+  }
+  if (hours === 4) {
+    return 45;
+  }
+  if (hours === 5 || hours === 6) {
+    return 60;
+  }
+  if (hours >= 7) {
+    return 120;
+  }
+  return 0;
+};
+
+const setupCalculator = () => {
+  const form = q("[data-calc-form]");
+  if (!form) {
+    return;
+  }
+
+  const hoursEl = q('[data-calc-input="hours"]', form);
+  const minutesEl = q('[data-calc-input="minutes"]', form);
+  const bhEl = q('[data-calc-input="bh"]', form);
+  const fccEl = q('[data-calc-input="fcc"]', form);
+
+  const outRaw = q('[data-calc-result="raw"]');
+  const outDeduction = q('[data-calc-result="deduction"]');
+  const outFinal = q('[data-calc-result="final"]');
+  const outMaintenance = q('[data-calc-result="maintenance"]');
+  const outBattery = q('[data-calc-result="battery"]');
+
+  const recalc = () => {
+    const hours = clamp(asInt(hoursEl?.value, 0), 0, 24);
+    const minutes = clamp(asInt(minutesEl?.value, 0), 0, 59);
+    const bh = clamp(asInt(bhEl?.value, 0), 0, 100);
+    const fcc = Math.max(0, asInt(fccEl?.value, 0));
+
+    const rawMinutes = hours * 60 + minutes;
+    const deduction = getSopDeduction(hours);
+    const normalizedMinutes = Math.max(0, rawMinutes - deduction);
+
+    const needsMaintenance = normalizedMinutes <= 120;
+    const strongReplaceSignal = bh < 60 && fcc < 30000 && normalizedMinutes < 120;
+    const replaceWithExceptionCheck = bh < 60 && !(fcc > 30000 && normalizedMinutes > 120);
+
+    let batteryDecision = "Battery masih bisa dipakai dengan monitoring berkala.";
+    if (strongReplaceSignal || replaceWithExceptionCheck) {
+      batteryDecision = "Wajib ganti battery: kesehatan sudah rendah untuk pemakaian jangka panjang.";
+    } else if (bh < 60 && fcc > 30000 && normalizedMinutes > 120) {
+      batteryDecision = "Pengecualian: boleh dipertimbangkan dengan catatan QC (FCC tinggi dan hasil test di atas 2 jam).";
+    } else if (bh <= 60 && fcc < 30000 && normalizedMinutes < 120) {
+      batteryDecision = "Rekomendasi ganti battery: BH/FCC rendah dan hasil test belum aman.";
+    }
+
+    if (outRaw) outRaw.textContent = toDurationText(rawMinutes);
+    if (outDeduction) outDeduction.textContent = `${deduction} menit`;
+    if (outFinal) outFinal.textContent = toDurationText(normalizedMinutes);
+    if (outMaintenance) outMaintenance.textContent = needsMaintenance ? "Lanjut maintenance 1-4" : "Lanjut validasi akhir & catat hasil QC";
+    if (outBattery) outBattery.textContent = batteryDecision;
+  };
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    recalc();
+  });
+
+  [hoursEl, minutesEl, bhEl, fccEl].forEach((input) => {
+    input?.addEventListener("input", recalc);
+    input?.addEventListener("change", recalc);
+  });
+
+  recalc();
 };
 
 const setupSectionObserver = () => {
@@ -493,7 +673,7 @@ const setupGsapMotion = () => {
     panels.forEach((panel) => {
       const textTargets = panel.querySelectorAll(".anim-target");
       const sceneTargets = panel.querySelectorAll(
-        ".visual-frame, .motion-card, .word-strip, .link-box, .cta-button, .step-item"
+        ".visual-frame, .motion-card, .word-strip, .link-box, .cta-button, .step-item, .calc-card, .calc-rule-table, .calc-form, .calc-result-card"
       );
 
       const tl = gsap.timeline({
@@ -628,6 +808,7 @@ const init = () => {
   renderPanels();
   renderProgressDots();
   createCornerNav();
+  setupCalculator();
   renderFooter();
   setupSectionObserver();
   setupPanelSwitchButtons();

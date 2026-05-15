@@ -47,11 +47,11 @@ Dokumen ini mencatat sumber gambar free-license dan referensi resmi vendor yang 
 ## Referensi Resmi Driver & Update Vendor
 
 - Lenovo Support: https://support.lenovo.com/
+- Lenovo Drivers & Software: https://support.lenovo.com/id/en/?tabName=Downloads
 - Lenovo System Update: https://support.lenovo.com/us/en/downloads/ds012808-lenovo-system-update-for-windows-10-7-32-bit-64-bit-desktop-notebook-workstation
-- Lenovo Vantage info: https://support.lenovo.com/uu/en/solutions/HT505081
 
 - Dell Drivers & Downloads: https://www.dell.com/support/home/en-us/drivers
-- Dell Command | Update: https://www.dell.com/support/kbdoc/en-us/000177325/dell-command-update
+- Dell Command | Update: https://www.dell.com/support/manuals/en-us/command-update/dcu_ug/dell-command-update
 - Dell SupportAssist: https://www.dell.com/support/contents/en-us/article/product-support/self-support-knowledgebase/software-and-downloads/supportassist
 
 - HP Drivers: https://support.hp.com/us-en/drivers
@@ -59,7 +59,7 @@ Dokumen ini mencatat sumber gambar free-license dan referensi resmi vendor yang 
 - HP Image Assistant (HPIA): https://support.hp.com/us-en/document/ish_7636709-7636753-16
 
 - ASUS Download Center: https://www.asus.com/support/download-center/
-- MyASUS System Update: https://www.asus.com/us/support/faq/1051729/
+- MyASUS System Update: https://www.asus.com/support/FAQ/1051729/
 - ASUS Live Update status: https://www.asus.com/us/support/faq/1018727/
 
 - Dynabook Drivers & Software: https://support.dynabook.com/support/driversResults
