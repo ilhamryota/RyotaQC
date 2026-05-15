@@ -21,11 +21,15 @@ window.RYOTAQC_CONTENT = {
     {
       id: "panel-intro",
       type: "intro",
-      theme: "dark",
+      theme: "split",
       kicker: "Pembukaan",
       title: "Bismillah, semoga ilmu QC battery ini menjadi berkah, bermanfaat, dan memudahkan pekerjaan harian.",
       body: "Sebelum mempelajari SOP ini, luruskan niat karena amal bergantung pada niat (HR. Bukhari no. 1, Muslim no. 1907). Allah juga meninggikan derajat orang berilmu (QS. Al-Mujadilah 58:11).",
-      axisHint: "Scroll untuk SOP Battery"
+      axisHint: "Scroll untuk SOP Battery",
+      brand: "RYOTAQC",
+      heroTitle: "WE'LL CREATE YOUR PERFECT QC FLOW",
+      heroSub: "Start achieving your laptop QC goals. Join us today.",
+      caption: "Here, animation gives a pumping vibe to a fitness website."
     },
     {
       id: "panel-knowledge",

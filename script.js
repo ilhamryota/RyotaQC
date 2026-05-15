@@ -145,15 +145,57 @@ const createOverlayMenu = () => {
 };
 
 const renderIntro = (panel) => `
-  <section id="${panel.id}" class="motion-panel theme-${panel.theme} intro-panel" data-panel>
+  <section id="${panel.id}" class="motion-panel theme-${panel.theme} intro-panel home-panel" data-panel>
     ${renderPanelMetaIcon(panel.type)}
-    <div class="axis-line"></div>
-    <div class="axis-orb" aria-hidden="true"><span></span></div>
-    <article class="intro-copy">
-      <p class="panel-kicker anim-target">${panel.kicker}</p>
-      <h1 class="panel-heading anim-target">${panel.title}</h1>
-      <p class="panel-body anim-target">${panel.body}</p>
-      <p class="intro-axis-hint anim-target">${panel.axisHint}</p>
+    <div class="home-right-dot" aria-hidden="true"></div>
+    <button class="home-sound-btn" type="button" aria-label="Toggle sound">
+      <span></span>
+    </button>
+    <article class="home-stage">
+      <p class="home-download-tag top anim-target">Download this video</p>
+      <section class="home-browser anim-target">
+        <header class="home-browser-head">
+          <span></span><span></span><span></span>
+        </header>
+        <div class="home-browser-nav">
+          <strong>${panel.brand || "RYOTAQC"}</strong>
+          <div>
+            <span>HOME</span>
+            <span>PRICING</span>
+            <span>ABOUT US</span>
+            <span>CONTACTS</span>
+          </div>
+          <a href="#panel-driver">Get in touch</a>
+        </div>
+        <div class="home-browser-body">
+          <article class="home-copy">
+            <h1 class="anim-target">${panel.heroTitle || "WE'LL CREATE YOUR PERFECT QC FLOW"}</h1>
+            <p class="anim-target">${panel.heroSub || "Start achieving your laptop QC goals. Join us today."}</p>
+          </article>
+          <div class="home-visual">
+            <figure class="hero-athlete anim-target">
+              <span class="hero-head"></span>
+              <span class="hero-body"></span>
+              <span class="hero-arm hero-arm-left"></span>
+              <span class="hero-arm hero-arm-right"></span>
+            </figure>
+            <aside class="home-metric black anim-target">
+              <small>Daily runtime burn</small>
+              <strong>230 bpm</strong>
+              <div>
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </aside>
+            <aside class="home-metric white anim-target">
+              <small>Heartrate</small>
+              <strong>230 bpm</strong>
+            </aside>
+          </div>
+        </div>
+        <footer class="home-browser-foot"></footer>
+      </section>
+      <p class="home-caption anim-target">${panel.caption || "Here, animation gives a pumping vibe to a fitness website."}</p>
+      <p class="home-download-tag bottom anim-target">Download audio from this page</p>
     </article>
   </section>
 `;
@@ -560,6 +602,73 @@ const setupCalculator = () => {
   recalc();
 };
 
+const setupHomeReplica = () => {
+  const homePanel = q(".home-panel");
+  if (!homePanel) {
+    return;
+  }
+
+  const dot = q(".home-right-dot", homePanel);
+  const browser = q(".home-browser", homePanel);
+  const caption = q(".home-caption", homePanel);
+
+  if (!window.gsap || !window.ScrollTrigger) {
+    const updateDot = () => {
+      if (!dot) return;
+      const top = homePanel.offsetTop;
+      const height = homePanel.offsetHeight || 1;
+      const progress = clamp((window.scrollY - top) / height, 0, 1);
+      dot.style.transform = `translate3d(0, ${-180 + progress * 360}px, 0)`;
+    };
+    window.addEventListener("scroll", updateDot, { passive: true });
+    updateDot();
+    return;
+  }
+
+  gsap.to(dot, {
+    y: 320,
+    ease: "none",
+    scrollTrigger: {
+      trigger: homePanel,
+      start: "top top",
+      end: "bottom top",
+      scrub: true
+    }
+  });
+
+  gsap.to(dot, {
+    scale: 1.12,
+    repeat: -1,
+    yoyo: true,
+    duration: 1.4,
+    ease: "sine.inOut"
+  });
+
+  gsap.fromTo(
+    browser,
+    { y: 100, scale: 0.94, rotateX: 10 },
+    {
+      y: 0,
+      scale: 1,
+      rotateX: 0,
+      ease: "power3.out",
+      duration: 1.1
+    }
+  );
+
+  gsap.fromTo(
+    caption,
+    { opacity: 0, y: 24 },
+    {
+      opacity: 1,
+      y: 0,
+      delay: 0.5,
+      duration: 0.7,
+      ease: "power2.out"
+    }
+  );
+};
+
 const setupSectionObserver = () => {
   const panels = [...document.querySelectorAll("[data-panel]")];
   const dots = [...document.querySelectorAll(".progress-dot")];
@@ -567,6 +676,7 @@ const setupSectionObserver = () => {
   const updateActive = (id) => {
     panels.forEach((panel) => panel.classList.toggle("active", panel.id === id));
     dots.forEach((dot) => dot.classList.toggle("active", dot.dataset.target === `#${id}`));
+    document.body.classList.toggle("home-active", id === "panel-intro");
   };
 
   const observer = new IntersectionObserver(
@@ -671,6 +781,36 @@ const setupGsapMotion = () => {
     const panels = [...document.querySelectorAll("[data-panel]")];
 
     panels.forEach((panel) => {
+      if (panel.classList.contains("home-panel")) {
+        const homeText = panel.querySelectorAll(".home-copy .anim-target, .home-caption, .home-download-tag");
+        const homeScene = panel.querySelectorAll(".home-browser, .home-metric, .hero-athlete, .home-right-dot");
+
+        const homeTl = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: {
+            trigger: panel,
+            start: "top top",
+            end: "+=240%",
+            scrub: true,
+            pin: true,
+            pinSpacing: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            fastScrollEnd: true,
+            onToggle: (self) => panel.classList.toggle("is-pinned", self.isActive)
+          }
+        });
+
+        homeTl.fromTo(panel, { filter: "brightness(0.92)" }, { filter: "brightness(1)", duration: 0.14 }, 0);
+        homeTl.fromTo(homeText, { opacity: 0, yPercent: 14 }, { opacity: 1, yPercent: 0, duration: 0.24, stagger: 0.03 }, 0.05);
+        homeTl.fromTo(homeScene, { opacity: 0.18, yPercent: 12, scale: 0.92 }, { opacity: 1, yPercent: 0, scale: 1, duration: 0.34, stagger: 0.02 }, 0.08);
+        homeTl.to(".home-right-dot", { yPercent: 200, duration: 0.7 }, 0.22);
+        homeTl.to(".home-browser", { yPercent: -12, scale: 1.02, duration: 0.26 }, 0.5);
+        homeTl.to([...homeText, ...homeScene], { opacity: 0, yPercent: -16, duration: 0.22, stagger: 0.01 }, 0.78);
+
+        return;
+      }
+
       const textTargets = panel.querySelectorAll(".anim-target");
       const sceneTargets = panel.querySelectorAll(
         ".visual-frame, .motion-card, .word-strip, .link-box, .cta-button, .step-item, .calc-card, .calc-rule-table, .calc-form, .calc-result-card"
@@ -809,6 +949,7 @@ const init = () => {
   renderProgressDots();
   createCornerNav();
   setupCalculator();
+  setupHomeReplica();
   renderFooter();
   setupSectionObserver();
   setupPanelSwitchButtons();
