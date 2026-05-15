@@ -79,7 +79,7 @@ const createTopbar = () => {
     <nav class="topbar-center" aria-label="Primary">${links}</nav>
     <div class="topbar-right">
       <button class="pill-btn menu-pill js-menu-toggle" type="button" aria-label="Open menu">
-        ${cfg.site.menuLabel}
+        <span class="menu-pill-label">${cfg.site.menuLabel}</span>
         <span class="menu-icon-wrap">${icons.menu}</span>
       </button>
     </div>
@@ -94,10 +94,10 @@ const createOverlayMenu = () => {
 
   const items = cfg.site.topLinks
     .map(
-      (item) => `
-        <a class="overlay-link" href="${item.target}">
-          <span class="overlay-link-icon">${icons.spark}</span>
-          <span>${item.label}</span>
+      (item, idx) => `
+        <a class="overlay-link overlay-mega-link" href="${item.target}">
+          <span class="overlay-link-index">${String(idx + 1).padStart(2, "0")}</span>
+          <span class="overlay-link-text">${item.label}</span>
           <span class="overlay-link-arrow">${icons.arrowRight}</span>
         </a>
       `
@@ -108,30 +108,66 @@ const createOverlayMenu = () => {
     <div class="overlay-inner">
       <div class="overlay-head">
         <p>${cfg.site.title}</p>
-        <button class="circle-btn icon-btn js-menu-close" type="button" aria-label="Close menu">${icons.close}</button>
+        <button class="pill-btn overlay-close js-menu-close" type="button" aria-label="Close menu">
+          <span>menu close</span>
+          <span class="menu-icon-wrap">${icons.close}</span>
+        </button>
       </div>
       <div class="overlay-links">${items}</div>
+      <div class="overlay-foot">
+        <p>Made by RyotaQC</p>
+        <p>SOP Battery / QC & Maintenance</p>
+      </div>
     </div>
   `;
 
   document.body.appendChild(overlay);
 
   const openBtn = q(".js-menu-toggle");
+  const openLabel = q(".menu-pill-label", openBtn || document);
   const closeBtn = q(".js-menu-close", overlay);
+  const megaLinks = [...overlay.querySelectorAll(".overlay-mega-link")];
+  let openTl = null;
 
   const open = () => {
-    overlay.classList.add("open");
+    overlay.classList.add("open", "entering");
     overlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("menu-open");
+    if (openLabel) {
+      openLabel.textContent = "menu close";
+    }
+
+    if (window.gsap) {
+      if (openTl) {
+        openTl.kill();
+      }
+      openTl = gsap.timeline();
+      openTl.fromTo(
+        ".overlay-mega-link",
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.42, stagger: 0.06, ease: "power3.out" },
+        0
+      );
+      openTl.fromTo(".overlay-foot", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.15);
+    }
   };
 
   const close = () => {
-    overlay.classList.remove("open");
+    overlay.classList.remove("open", "entering");
     overlay.setAttribute("aria-hidden", "true");
     document.body.classList.remove("menu-open");
+    if (openLabel) {
+      openLabel.textContent = cfg.site.menuLabel;
+    }
   };
 
-  openBtn?.addEventListener("click", open);
+  openBtn?.addEventListener("click", () => {
+    if (overlay.classList.contains("open")) {
+      close();
+      return;
+    }
+    open();
+  });
   closeBtn?.addEventListener("click", close);
   overlay.addEventListener("click", (event) => {
     if (event.target === overlay) {
@@ -139,7 +175,7 @@ const createOverlayMenu = () => {
     }
   });
 
-  overlay.querySelectorAll("a").forEach((link) => {
+  megaLinks.forEach((link) => {
     link.addEventListener("click", close);
   });
 };
@@ -669,6 +705,71 @@ const setupHomeReplica = () => {
   );
 };
 
+const setupCustomCursor = () => {
+  if (!window.matchMedia("(hover: hover)").matches || window.matchMedia("(pointer: coarse)").matches) {
+    return;
+  }
+
+  const layer = document.createElement("div");
+  layer.className = "custom-cursor-layer";
+  layer.innerHTML = `
+    <div class="cursor-ring"></div>
+    <div class="cursor-dot"></div>
+  `;
+  document.body.appendChild(layer);
+  document.body.classList.add("has-custom-cursor");
+
+  const ring = q(".cursor-ring", layer);
+  const dot = q(".cursor-dot", layer);
+
+  let visible = false;
+  let tx = window.innerWidth * 0.5;
+  let ty = window.innerHeight * 0.5;
+  let rx = tx;
+  let ry = ty;
+  let raf = null;
+
+  const render = () => {
+    rx += (tx - rx) * 0.22;
+    ry += (ty - ry) * 0.22;
+    ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+    dot.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+    raf = requestAnimationFrame(render);
+  };
+
+  const show = () => {
+    if (visible) return;
+    visible = true;
+    layer.classList.add("visible");
+  };
+
+  const hide = () => {
+    visible = false;
+    layer.classList.remove("visible");
+  };
+
+  const onMove = (event) => {
+    tx = event.clientX;
+    ty = event.clientY;
+    show();
+    if (!raf) {
+      raf = requestAnimationFrame(render);
+    }
+  };
+
+  window.addEventListener("mousemove", onMove, { passive: true });
+  window.addEventListener("mouseenter", show);
+  window.addEventListener("mouseleave", hide);
+
+  document.addEventListener("mouseover", (event) => {
+    const hit = event.target instanceof Element && event.target.closest("a, button, input, select, textarea, label, .progress-dot");
+    layer.classList.toggle("hover", Boolean(hit));
+  });
+
+  document.addEventListener("mousedown", () => layer.classList.add("down"));
+  document.addEventListener("mouseup", () => layer.classList.remove("down"));
+};
+
 const setupSectionObserver = () => {
   const panels = [...document.querySelectorAll("[data-panel]")];
   const dots = [...document.querySelectorAll(".progress-dot")];
@@ -943,6 +1044,7 @@ const setupMouseParallax = () => {
 };
 
 const init = () => {
+  setupCustomCursor();
   createTopbar();
   createOverlayMenu();
   renderPanels();
