@@ -414,6 +414,7 @@ const setupGsapMotion = () => {
   }
 
   gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true });
 
   document.querySelectorAll("[data-panel]").forEach((panel) => {
     const targets = panel.querySelectorAll(".anim-target");
@@ -481,6 +482,107 @@ const setupGsapMotion = () => {
           }
         }
       );
+    });
+  });
+
+  const mm = gsap.matchMedia();
+
+  mm.add("(min-width: 980px)", () => {
+    const panels = [...document.querySelectorAll("[data-panel]")];
+
+    panels.forEach((panel) => {
+      const textTargets = panel.querySelectorAll(".anim-target");
+      const sceneTargets = panel.querySelectorAll(
+        ".visual-frame, .motion-card, .word-strip, .link-box, .cta-button, .step-item"
+      );
+
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: panel,
+          start: "top top",
+          end: "+=180%",
+          scrub: true,
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          fastScrollEnd: true,
+          onToggle: (self) => panel.classList.toggle("is-pinned", self.isActive)
+        }
+      });
+
+      tl.fromTo(panel, { filter: "brightness(0.72)" }, { filter: "brightness(1)", duration: 0.16 }, 0);
+
+      if (textTargets.length) {
+        tl.fromTo(
+          textTargets,
+          {
+            opacity: 0.08,
+            yPercent: 12,
+            z: 90,
+            rotationX: 12,
+            transformOrigin: "50% 100%"
+          },
+          {
+            opacity: 1,
+            yPercent: 0,
+            z: 0,
+            rotationX: 0,
+            duration: 0.3,
+            stagger: 0.035
+          },
+          0.05
+        );
+
+        tl.to(
+          textTargets,
+          {
+            opacity: 0,
+            yPercent: -18,
+            duration: 0.26,
+            stagger: 0.02
+          },
+          0.74
+        );
+      }
+
+      if (sceneTargets.length) {
+        tl.fromTo(
+          sceneTargets,
+          {
+            opacity: 0.12,
+            scale: 0.9,
+            yPercent: 8,
+            z: 140,
+            filter: "blur(5px)"
+          },
+          {
+            opacity: 1,
+            scale: 1,
+            yPercent: 0,
+            z: 0,
+            filter: "blur(0px)",
+            duration: 0.32,
+            stagger: 0.02
+          },
+          0.08
+        );
+
+        tl.to(
+          sceneTargets,
+          {
+            opacity: 0.2,
+            scale: 0.96,
+            yPercent: -12,
+            duration: 0.28,
+            stagger: 0.015
+          },
+          0.72
+        );
+      }
+
+      tl.to(panel, { yPercent: -6, scale: 0.985, filter: "brightness(0.82)", duration: 0.28 }, 0.72);
     });
   });
 };

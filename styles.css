@@ -232,6 +232,12 @@ svg {
   padding: clamp(6rem, 10vw, 8rem) clamp(1rem, 3.2vw, 2.4rem) clamp(2rem, 4vw, 2.6rem);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   overflow: clip;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.motion-panel.is-pinned {
+  z-index: 5;
 }
 
 .panel-meta-icon {
@@ -642,6 +648,8 @@ svg {
 .anim-target {
   opacity: 0;
   transform: translate3d(0, 56px, 0);
+  backface-visibility: hidden;
+  will-change: transform, opacity, filter;
 }
 
 @keyframes pulseRing {
