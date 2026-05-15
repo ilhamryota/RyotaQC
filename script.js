@@ -6,6 +6,63 @@ if (!cfg || !cfg.panels || !cfg.site) {
 
 const q = (selector, root = document) => root.querySelector(selector);
 
+const icons = {
+  arrowLeft: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M14.5 5.5L8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `,
+  arrowRight: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M9.5 5.5L16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `,
+  menu: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 7.5h16M9 12h11M4 16.5h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  `,
+  close: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  `,
+  spark: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 2l1.9 5.2L19 9l-5.1 1.8L12 16l-1.9-5.2L5 9l5.1-1.8L12 2z" fill="currentColor"/>
+    </svg>
+  `,
+  node: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <circle cx="12" cy="12" r="3" fill="currentColor"/>
+    </svg>
+  `,
+  external: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M8 8h8v8M16 8l-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `,
+  dot: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="5" fill="currentColor"/>
+    </svg>
+  `
+};
+
+const panelIconByType = {
+  intro: icons.node,
+  split: icons.spark,
+  strips: icons.spark,
+  cards: icons.node,
+  focus: icons.dot,
+  steps: icons.spark,
+  links: icons.node,
+  cta: icons.spark
+};
+
+const renderPanelMetaIcon = (type) => `<span class="panel-meta-icon" aria-hidden="true">${panelIconByType[type] || icons.spark}</span>`;
+
 const createTopbar = () => {
   const topbar = q("#topbar");
   const links = cfg.site.topLinks
@@ -14,19 +71,81 @@ const createTopbar = () => {
 
   topbar.innerHTML = `
     <div class="topbar-left">
-      <button class="circle-btn" type="button" aria-hidden="true">?</button>
-      <button class="circle-btn" type="button" aria-hidden="true">?</button>
+      <button class="circle-btn icon-btn js-prev-panel" type="button" aria-label="Section sebelumnya">${icons.arrowLeft}</button>
+      <button class="circle-btn icon-btn js-next-panel" type="button" aria-label="Section berikutnya">${icons.arrowRight}</button>
       <a class="pill-btn" href="#panel-intro">${cfg.site.brandPill}</a>
     </div>
     <nav class="topbar-center" aria-label="Primary">${links}</nav>
     <div class="topbar-right">
-      <button class="pill-btn menu-pill" type="button" aria-label="Open menu">${cfg.site.menuLabel} <span>=</span></button>
+      <button class="pill-btn menu-pill js-menu-toggle" type="button" aria-label="Open menu">
+        ${cfg.site.menuLabel}
+        <span class="menu-icon-wrap">${icons.menu}</span>
+      </button>
     </div>
   `;
 };
 
+const createOverlayMenu = () => {
+  const overlay = document.createElement("aside");
+  overlay.className = "menu-overlay";
+  overlay.id = "menu-overlay";
+  overlay.setAttribute("aria-hidden", "true");
+
+  const items = cfg.site.topLinks
+    .map(
+      (item) => `
+        <a class="overlay-link" href="${item.target}">
+          <span class="overlay-link-icon">${icons.spark}</span>
+          <span>${item.label}</span>
+          <span class="overlay-link-arrow">${icons.arrowRight}</span>
+        </a>
+      `
+    )
+    .join("");
+
+  overlay.innerHTML = `
+    <div class="overlay-inner">
+      <div class="overlay-head">
+        <p>${cfg.site.title}</p>
+        <button class="circle-btn icon-btn js-menu-close" type="button" aria-label="Close menu">${icons.close}</button>
+      </div>
+      <div class="overlay-links">${items}</div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const openBtn = q(".js-menu-toggle");
+  const closeBtn = q(".js-menu-close", overlay);
+
+  const open = () => {
+    overlay.classList.add("open");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("menu-open");
+  };
+
+  const close = () => {
+    overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("menu-open");
+  };
+
+  openBtn?.addEventListener("click", open);
+  closeBtn?.addEventListener("click", close);
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      close();
+    }
+  });
+
+  overlay.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", close);
+  });
+};
+
 const renderIntro = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme} intro-panel" data-panel>
+    ${renderPanelMetaIcon(panel.type)}
     <div class="axis-line"></div>
     <div class="axis-orb" aria-hidden="true"><span></span></div>
     <article class="intro-copy">
@@ -40,6 +159,7 @@ const renderIntro = (panel) => `
 
 const renderSplit = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme} split-panel" data-panel>
+    ${renderPanelMetaIcon(panel.type)}
     <div class="split-stage">
       <article>
         <h2 class="split-title anim-target">${panel.titleLines.map((line) => `<span>${line}</span>`).join("")}</h2>
@@ -54,6 +174,7 @@ const renderSplit = (panel) => `
 
 const renderStrips = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme}" data-panel>
+    ${renderPanelMetaIcon(panel.type)}
     <p class="panel-kicker anim-target">${cfg.site.introTag}</p>
     <div class="strip-wrap">
       ${panel.words.map((word) => `<div class="word-strip anim-target">${word}</div>`).join("")}
@@ -64,6 +185,7 @@ const renderStrips = (panel) => `
 
 const renderCards = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme}" data-panel>
+    ${renderPanelMetaIcon(panel.type)}
     <div class="cards-heading">
       <p class="panel-kicker anim-target">${panel.kicker}</p>
       <h2 class="panel-heading anim-target">${panel.heading}</h2>
@@ -76,7 +198,10 @@ const renderCards = (panel) => `
               <figure class="motion-card-media parallax-layer">
                 <img class="panel-image" src="${card.image}" alt="${card.imageAlt}" loading="lazy" />
               </figure>
-              <h3>${card.title}</h3>
+              <div class="card-title-row">
+                <span class="card-title-icon">${icons.spark}</span>
+                <h3>${card.title}</h3>
+              </div>
               <p>${card.text}</p>
             </article>
           `
@@ -88,6 +213,7 @@ const renderCards = (panel) => `
 
 const renderFocus = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme}" data-panel>
+    ${renderPanelMetaIcon(panel.type)}
     <div class="focus-grid">
       <article>
         <p class="panel-kicker anim-target">${panel.kicker}</p>
@@ -103,12 +229,22 @@ const renderFocus = (panel) => `
 
 const renderSteps = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme}" data-panel>
+    ${renderPanelMetaIcon(panel.type)}
     <div class="steps-grid">
       <article>
         <p class="panel-kicker anim-target">${panel.kicker}</p>
         <h2 class="panel-heading anim-target">${panel.heading}</h2>
         <ol class="step-list">
-          ${panel.steps.map((step) => `<li class="step-item anim-target">${step}</li>`).join("")}
+          ${panel.steps
+            .map(
+              (step) => `
+                <li class="step-item anim-target">
+                  <span class="step-icon">${icons.dot}</span>
+                  <span>${step}</span>
+                </li>
+              `
+            )
+            .join("")}
         </ol>
       </article>
       <figure class="visual-frame morph-frame anim-target parallax-layer">
@@ -120,6 +256,7 @@ const renderSteps = (panel) => `
 
 const renderLinks = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme}" data-panel>
+    ${renderPanelMetaIcon(panel.type)}
     <p class="panel-kicker anim-target">${panel.kicker}</p>
     <h2 class="panel-heading anim-target">${panel.heading}</h2>
     <div class="links-grid">
@@ -128,7 +265,16 @@ const renderLinks = (panel) => `
           (group) => `
             <article class="link-box anim-target">
               <h3>${group.name}</h3>
-              ${group.links.map((link) => `<a href="${link.href}" target="_blank" rel="noopener">${link.label}</a>`).join("")}
+              ${group.links
+                .map(
+                  (link) => `
+                    <a href="${link.href}" target="_blank" rel="noopener">
+                      <span>${link.label}</span>
+                      <span class="link-ext-icon">${icons.external}</span>
+                    </a>
+                  `
+                )
+                .join("")}
             </article>
           `
         )
@@ -139,6 +285,7 @@ const renderLinks = (panel) => `
 
 const renderCta = (panel) => `
   <section id="${panel.id}" class="motion-panel theme-${panel.theme}" data-panel>
+    ${renderPanelMetaIcon(panel.type)}
     <article class="cta-wrap">
       <h2 class="panel-heading anim-target">${panel.heading}</h2>
       <p class="panel-body anim-target">${panel.body}</p>
@@ -188,6 +335,41 @@ const renderProgressDots = () => {
       const target = q(dot.dataset.target);
       target?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+  });
+};
+
+const createCornerNav = () => {
+  const box = document.createElement("div");
+  box.className = "corner-nav";
+  box.innerHTML = `
+    <button class="corner-btn js-prev-panel" type="button" aria-label="Section sebelumnya">${icons.arrowLeft}</button>
+    <button class="corner-btn js-next-panel" type="button" aria-label="Section berikutnya">${icons.arrowRight}</button>
+  `;
+  document.body.appendChild(box);
+};
+
+const setupPanelSwitchButtons = () => {
+  const panels = [...document.querySelectorAll("[data-panel]")];
+  if (!panels.length) {
+    return;
+  }
+
+  const getActiveIndex = () => {
+    const current = panels.findIndex((panel) => panel.classList.contains("active"));
+    return current >= 0 ? current : 0;
+  };
+
+  const moveTo = (nextIndex) => {
+    const bounded = Math.max(0, Math.min(panels.length - 1, nextIndex));
+    panels[bounded]?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  document.querySelectorAll(".js-prev-panel").forEach((btn) => {
+    btn.addEventListener("click", () => moveTo(getActiveIndex() - 1));
+  });
+
+  document.querySelectorAll(".js-next-panel").forEach((btn) => {
+    btn.addEventListener("click", () => moveTo(getActiveIndex() + 1));
   });
 };
 
@@ -340,10 +522,13 @@ const setupMouseParallax = () => {
 
 const init = () => {
   createTopbar();
+  createOverlayMenu();
   renderPanels();
   renderProgressDots();
+  createCornerNav();
   renderFooter();
   setupSectionObserver();
+  setupPanelSwitchButtons();
   setupGsapMotion();
   setupMouseParallax();
 };
