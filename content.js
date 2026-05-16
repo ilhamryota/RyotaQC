@@ -3,7 +3,7 @@
     title: "RyotaQC",
     subtitle: "Portal Artikel, Informasi, Tools, Download, dan Quiz",
     logoText: "RYOTAQC",
-    topNote: "Website pembelajaran, informasi, dan update terbaru RyotaQC.",
+    topNote: "",
     menuLabel: "Menu",
     nav: [
       { key: "home", label: "Beranda", href: "index.html" },
@@ -53,66 +53,61 @@
   pages: {
     home: {
       pageTitle: "Beranda",
-      hero: {
-        tag: "Featured",
-        title: "Selamat Datang di Portal RyotaQC",
-        excerpt:
-          "Tempat terpusat untuk artikel, informasi berita, panduan pembelajaran, tools, download, dan quiz interaktif.",
-        image: "assets/images/step-hardware-inspection.webp",
-        imageAlt: "Ilustrasi pengecekan hardware laptop",
-        buttonLabel: "Baca Artikel",
-        buttonHref: "articles.html"
-      },
-      blocks: [
+      sectionTitle: "Software Terbaru",
+      sliderPrevLabel: "\u00AB",
+      sliderNextLabel: "\u00BB",
+      softwareItems: [
         {
-          title: "Artikel Terbaru",
-          items: [
-            {
-              category: "Tutorial",
-              title: "Panduan Dasar QC Laptop untuk Pemula",
-              date: "16 Mei 2026",
-              excerpt: "Langkah ringkas memulai pemeriksaan unit laptop secara rapi dan terukur.",
-              image: "assets/images/step-hardware-inspection.jpg",
-              imageAlt: "Teknisi mengecek laptop"
-            },
-            {
-              category: "Windows",
-              title: "Cara Cek Update Driver yang Aman",
-              date: "15 Mei 2026",
-              excerpt: "Strategi update driver official agar sistem stabil dan performa optimal.",
-              image: "assets/images/windows-update-screen.png",
-              imageAlt: "Layar update windows"
-            },
-            {
-              category: "Tips",
-              title: "Checklist Sebelum Running Test Battery",
-              date: "14 Mei 2026",
-              excerpt: "Pastikan setting brightness, audio, dan charge awal sudah sesuai SOP.",
-              image: "assets/images/windows11-settings.png",
-              imageAlt: "Pengaturan windows 11"
-            }
-          ]
+          category: "ADOBE",
+          categoryLink: "#",
+          date: "13 MEI 2026",
+          comments: "14 COMMENTS",
+          commentsLink: "#",
+          title: "Adobe Premiere Pro 2026 (Windows)",
+          href: "#",
+          excerpt:
+            "Adobe Premiere Pro 2026 Full Version Terbaru v26.2 Pernah ngalamin gak, lagi asyik-asyiknya edit video buat klien, tiba-tiba timeline Premiere Pro freeze dan project...",
+          image: "https://www.yasir252.com/wp-content/uploads/2026/03/download-premiere-pro-2026-full-version-windows.jpg",
+          imageAlt: "Adobe Premiere Pro 2026 Windows"
         },
         {
-          title: "Berita & Update RyotaQC",
-          items: [
-            {
-              category: "Update",
-              title: "Rencana Rilis Materi Minggu Ini",
-              date: "16 Mei 2026",
-              excerpt: "Akan ada batch artikel baru: battery, maintenance, dan quiz evaluasi.",
-              image: "assets/images/step-maintenance-repair.jpg",
-              imageAlt: "Perbaikan laptop"
-            },
-            {
-              category: "News",
-              title: "Portal Multi Halaman Sudah Aktif",
-              date: "16 Mei 2026",
-              excerpt: "Setiap menu kini punya halaman sendiri agar lebih rapi dan scalable.",
-              image: "assets/images/technician-illustration.svg",
-              imageAlt: "Ilustrasi teknisi"
-            }
-          ]
+          category: "DESIGN",
+          categoryLink: "#",
+          date: "13 MEI 2026",
+          comments: "6 COMMENTS",
+          commentsLink: "#",
+          title: "Adobe Illustrator 2026 (Windows)",
+          href: "#",
+          excerpt:
+            "Adobe Illustrator 2026 Download Gratis v30.4 (PC) Membuat desain vektor tanpa Adobe Illustrator itu... seperti melukis pake ranting yang tipis, gak enak. Karena itulah,...",
+          image: "https://www.yasir252.com/wp-content/uploads/2026/03/download-adobe-illustrator-2026-full.jpg",
+          imageAlt: "Adobe Illustrator 2026 Windows"
+        },
+        {
+          category: "ADOBE",
+          categoryLink: "#",
+          date: "13 MEI 2026",
+          comments: "NO COMMENT",
+          commentsLink: "#",
+          title: "Adobe Media Encoder 2026 (Windows)",
+          href: "#",
+          excerpt:
+            "Adobe Media Encoder 2026 Download Terbaru (64 Bit) Pada artikel ini, YASIR252 mau share direct link untuk download aplikasi Media Encoder 2026 full version...",
+          image: "https://www.yasir252.com/wp-content/uploads/2026/04/download-adobe-media-encoder-2026.jpg",
+          imageAlt: "Adobe Media Encoder 2026 Windows"
+        },
+        {
+          category: "OFFICE",
+          categoryLink: "#",
+          date: "13 MEI 2026",
+          comments: "NO COMMENT",
+          commentsLink: "#",
+          title: "FX Math Tools",
+          href: "#",
+          excerpt:
+            "Download FX Math Tools Full Version Gratis FX Math Tools Free Download Full v26.05.04 Terbaru. Jika kalian ada seorang guru atau dosen dalam bidang...",
+          image: "https://www.yasir252.com/wp-content/uploads/2024/11/fx-math-tools-multidocs-free-download-full-version.jpg",
+          imageAlt: "FX Math Tools Windows"
         }
       ]
     },

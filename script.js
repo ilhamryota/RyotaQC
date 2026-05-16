@@ -126,9 +126,17 @@ const renderTopNote = () => {
     return;
   }
 
+  const noteText = cfg.site?.topNote || "";
+  if (!String(noteText).trim()) {
+    topNote.innerHTML = "";
+    topNote.style.display = "none";
+    return;
+  }
+
+  topNote.style.display = "block";
   topNote.innerHTML = `
     <div class="top-note-inner">
-      <span>${cfg.site?.topNote || "Portal informasi dan pembelajaran"}</span>
+      <span>${noteText}</span>
     </div>
   `;
 };
@@ -238,6 +246,24 @@ const renderPostCard = (item) => `
   </article>
 `;
 
+const renderSoftwareRow = (item) => `
+  <article class="software-row">
+    <a class="software-thumb" href="${item.href || "#"}">
+      <img src="${item.image || ""}" alt="${item.imageAlt || item.title || "Software image"}" loading="lazy" />
+    </a>
+    <div class="software-main">
+      <h3><a href="${item.href || "#"}">${item.title || "Software Title"}</a></h3>
+      <div class="software-meta">
+        <span class="software-meta-bar" aria-hidden="true"></span>
+        <a href="${item.categoryLink || "#"}">${item.category || "SOFTWARE"}</a>
+        <span>/ ${item.date || "-"}</span>
+        <a href="${item.commentsLink || "#"}">/ ${item.comments || "NO COMMENT"}</a>
+      </div>
+      <p>${item.excerpt || ""}</p>
+    </div>
+  </article>
+`;
+
 const renderSidebar = () => {
   const sidebar = cfg.site?.sidebar || {};
   const categories = asArray(sidebar.categories);
@@ -269,42 +295,22 @@ const renderSidebar = () => {
 
 const renderHomePage = () => {
   const page = cfg.pages?.home || {};
-  const hero = page.hero || {};
-  const blocks = asArray(page.blocks);
+  const items = asArray(page.softwareItems);
 
   return `
-    <section class="hero-box">
-      <figure>
-        <img src="${hero.image || "assets/images/step-hardware-inspection.webp"}" alt="${hero.imageAlt || "Hero"}" loading="lazy" />
-      </figure>
-      <article>
-        <p class="hero-tag">${hero.tag || "Featured"}</p>
-        <h1>${hero.title || "RyotaQC"}</h1>
-        <p>${hero.excerpt || ""}</p>
-        <a href="${hero.buttonHref || "articles.html"}" class="primary-btn">${hero.buttonLabel || "Baca"}</a>
-      </article>
-    </section>
-
-    <div class="portal-grid">
-      <div class="content-column">
-        ${blocks
-          .map(
-            (block) => `
-          <section class="content-block">
-            <header>
-              <h2>${block.title || "Section"}</h2>
-            </header>
-            <div class="post-grid ${block.items?.length === 2 ? "two-col" : ""}">
-              ${asArray(block.items).map((item) => renderPostCard(item)).join("")}
-            </div>
-          </section>
-        `
-          )
-          .join("")}
+    <section class="software-section">
+      <header class="software-section-head">
+        <h2>${page.sectionTitle || "Software Terbaru"}</h2>
+        <div class="software-head-nav" aria-hidden="true">
+          <button type="button" class="software-nav-btn">${page.sliderPrevLabel || "\u00AB"}</button>
+          <button type="button" class="software-nav-btn">${page.sliderNextLabel || "\u00BB"}</button>
+        </div>
+      </header>
+      <div class="software-divider"></div>
+      <div class="software-list">
+        ${items.map((item) => renderSoftwareRow(item)).join("")}
       </div>
-
-      ${renderSidebar()}
-    </div>
+    </section>
   `;
 };
 
