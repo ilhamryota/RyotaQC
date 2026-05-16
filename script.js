@@ -1,12 +1,15 @@
 ﻿const cfg = window.RYOTAQC_CONTENT || {};
-const q = (sel, root = document) => root.querySelector(sel);
-const qa = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-const normalizeList = (value) => (Array.isArray(value) ? value : []);
+const q = (selector, root = document) => root.querySelector(selector);
+const qa = (selector, root = document) => [...root.querySelectorAll(selector)];
+const asArray = (value) => (Array.isArray(value) ? value : []);
+
+const getCurrentPageKey = () => document.body?.dataset?.page || "home";
 
 const getMaintenanceDevContext = () => {
   const maintenance = cfg.site?.maintenance || {};
   const dev = maintenance.devAccess || {};
+
   const queryParam = dev.queryParam || "dev_key";
   const viewParam = dev.viewParam || "dev_view";
   const logoutParam = dev.logoutParam || "dev_logout";
@@ -117,59 +120,81 @@ const getMaintenanceDevContext = () => {
   };
 };
 
-const renderHeader = () => {
+const renderTopNote = () => {
+  const topNote = q("#top-note");
+  if (!topNote) {
+    return;
+  }
+
+  topNote.innerHTML = `
+    <div class="top-note-inner">
+      <span>${cfg.site?.topNote || "Portal informasi dan pembelajaran"}</span>
+    </div>
+  `;
+};
+
+const renderHeader = (pageKey) => {
   const header = q("#site-header");
   if (!header) {
     return;
   }
 
-  const menu = normalizeList(cfg.site?.menu);
+  const nav = asArray(cfg.site?.nav);
 
   header.innerHTML = `
-    <div class="header-shell">
-      <a class="brand" href="#beranda">
-        <span class="brand-dot"></span>
+    <div class="header-inner">
+      <a class="site-logo" href="index.html" aria-label="Beranda ${cfg.site?.title || "RyotaQC"}">
+        <span class="logo-dot"></span>
         <div>
-          <strong>${cfg.site?.title || "RyotaQC"}</strong>
-          <small>${cfg.site?.badge || "Update Center"}</small>
+          <strong>${cfg.site?.logoText || "RYOTAQC"}</strong>
+          <small>${cfg.site?.subtitle || "Portal"}</small>
         </div>
       </a>
 
-      <button class="menu-button" type="button" data-open-menu>${cfg.site?.menuLabel || "Menu"}</button>
-    </div>
-
-    <div class="menu-backdrop" data-close-menu></div>
-
-    <nav class="menu-drawer" aria-label="Menu Utama">
-      <div class="menu-drawer-head">
-        <span>Menu</span>
-        <button class="menu-close" type="button" data-close-menu aria-label="Tutup menu">x</button>
-      </div>
-      <div class="menu-list">
-        ${menu
+      <nav class="main-nav" aria-label="Navigasi utama">
+        ${nav
           .map(
             (item) => `
-          <a href="#${item.id}" data-menu-link>
-            <span>${item.label}</span>
-            <small>Open</small>
-          </a>
+          <a href="${item.href}" class="${item.key === pageKey ? "active" : ""}">${item.label}</a>
+        `
+          )
+          .join("")}
+      </nav>
+
+      <button class="menu-toggle" type="button" data-open-menu>${cfg.site?.menuLabel || "Menu"}</button>
+    </div>
+
+    <div class="mobile-backdrop" data-close-menu></div>
+
+    <aside class="mobile-drawer" aria-label="Menu mobile">
+      <div class="drawer-head">
+        <strong>Menu</strong>
+        <button type="button" class="drawer-close" data-close-menu aria-label="Tutup menu">x</button>
+      </div>
+      <div class="drawer-links">
+        ${nav
+          .map(
+            (item) => `
+          <a href="${item.href}" class="${item.key === pageKey ? "active" : ""}" data-mobile-link>${item.label}</a>
         `
           )
           .join("")}
       </div>
-    </nav>
+    </aside>
   `;
 
   q("[data-open-menu]", header)?.addEventListener("click", () => {
     document.body.classList.add("menu-open");
   });
 
-  qa("[data-close-menu]", header).forEach((el) => {
-    el.addEventListener("click", () => document.body.classList.remove("menu-open"));
+  qa("[data-close-menu]", header).forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.body.classList.remove("menu-open");
+    });
   });
 
-  qa("[data-menu-link]", header).forEach((el) => {
-    el.addEventListener("click", () => {
+  qa("[data-mobile-link]", header).forEach((link) => {
+    link.addEventListener("click", () => {
       document.body.classList.remove("menu-open");
     });
   });
@@ -190,209 +215,320 @@ const renderFooter = (maintenanceMode = false) => {
   }
 
   footer.innerHTML = `
-    <span>${cfg.footer?.left || cfg.site?.title || "RyotaQC"}</span>
-    <span>${cfg.footer?.right || "All rights reserved"}</span>
+    <span>${cfg.footer?.left || "RyotaQC"}</span>
+    <span>${cfg.footer?.right || "Portal"}</span>
   `;
 };
 
-const renderHero = () => {
-  const hero = cfg.site?.hero || {};
-  return `
-    <section id="beranda" class="section hero-section reveal">
-      <div class="hero-card">
-        <p class="hero-kicker">${hero.kicker || "Simple. Modern. Fast."}</p>
-        <h1>${hero.title || "Portal Utama RyotaQC"}</h1>
-        <p>${hero.subtitle || "Website RyotaQC versi baru."}</p>
+const renderPostCard = (item) => `
+  <article class="post-card">
+    ${
+      item.image
+        ? `<figure><img src="${item.image}" alt="${item.imageAlt || item.title || "Gambar"}" loading="lazy" /></figure>`
+        : ""
+    }
+    <div class="post-body">
+      <div class="post-meta">
+        <span>${item.category || "Article"}</span>
+        <time>${item.date || "-"}</time>
+      </div>
+      <h3>${item.title || "Judul"}</h3>
+      <p>${item.excerpt || ""}</p>
+    </div>
+  </article>
+`;
 
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="${hero.primaryButton?.target || "#information"}">${hero.primaryButton?.label || "Information"}</a>
-          <a class="btn btn-ghost" href="${hero.secondaryButton?.target || "#tools"}">${hero.secondaryButton?.label || "Tools"}</a>
+const renderSidebar = () => {
+  const sidebar = cfg.site?.sidebar || {};
+  const categories = asArray(sidebar.categories);
+  const popular = asArray(sidebar.popular);
+
+  return `
+    <aside class="sidebar">
+      <section class="side-card">
+        <h4>${sidebar.aboutTitle || "Tentang"}</h4>
+        <p>${sidebar.aboutBody || ""}</p>
+      </section>
+
+      <section class="side-card">
+        <h4>${sidebar.categoriesTitle || "Kategori"}</h4>
+        <div class="chip-list">
+          ${categories.map((cat) => `<span>${cat}</span>`).join("")}
         </div>
-      </div>
+      </section>
 
-      <div class="hero-glow" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </section>
+      <section class="side-card">
+        <h4>${sidebar.popularTitle || "Populer"}</h4>
+        <ol>
+          ${popular.map((item) => `<li>${item}</li>`).join("")}
+        </ol>
+      </section>
+    </aside>
   `;
 };
 
-const renderBeranda = () => {
-  const block = cfg.sections?.beranda || {};
-  const highlights = normalizeList(block.highlights);
+const renderHomePage = () => {
+  const page = cfg.pages?.home || {};
+  const hero = page.hero || {};
+  const blocks = asArray(page.blocks);
 
   return `
-    <section class="section reveal">
-      <div class="section-head">
-        <h2>${block.title || "Beranda"}</h2>
-        <p>${block.description || ""}</p>
-      </div>
-      <div class="grid-3">
-        ${highlights
+    <section class="hero-box">
+      <figure>
+        <img src="${hero.image || "assets/images/step-hardware-inspection.webp"}" alt="${hero.imageAlt || "Hero"}" loading="lazy" />
+      </figure>
+      <article>
+        <p class="hero-tag">${hero.tag || "Featured"}</p>
+        <h1>${hero.title || "RyotaQC"}</h1>
+        <p>${hero.excerpt || ""}</p>
+        <a href="${hero.buttonHref || "articles.html"}" class="primary-btn">${hero.buttonLabel || "Baca"}</a>
+      </article>
+    </section>
+
+    <div class="portal-grid">
+      <div class="content-column">
+        ${blocks
           .map(
-            (item) => `
-          <article class="card">
-            <h3>${item.title}</h3>
-            <p>${item.text}</p>
-          </article>
+            (block) => `
+          <section class="content-block">
+            <header>
+              <h2>${block.title || "Section"}</h2>
+            </header>
+            <div class="post-grid ${block.items?.length === 2 ? "two-col" : ""}">
+              ${asArray(block.items).map((item) => renderPostCard(item)).join("")}
+            </div>
+          </section>
         `
           )
           .join("")}
       </div>
-    </section>
+
+      ${renderSidebar()}
+    </div>
   `;
 };
 
-const renderInformation = () => {
-  const block = cfg.sections?.information || {};
-  const items = normalizeList(block.items);
+const renderArticlesPage = () => {
+  const page = cfg.pages?.articles || {};
 
   return `
-    <section id="information" class="section reveal">
-      <div class="section-head">
-        <h2>${block.title || "Information"}</h2>
-        <p>${block.description || ""}</p>
-      </div>
-      <div class="grid-3">
-        ${items
-          .map(
-            (item) => `
-          <article class="card card-highlight">
-            <span class="tag">${item.tag}</span>
-            <h3>${item.heading}</h3>
-            <p>${item.body}</p>
-          </article>
-        `
-          )
-          .join("")}
-      </div>
+    <section class="page-head">
+      <h1>${page.pageTitle || "Artikel"}</h1>
+      <p>${page.intro || ""}</p>
     </section>
+
+    <div class="portal-grid">
+      <div class="content-column">
+        <section class="content-block">
+          <div class="post-grid">
+            ${asArray(page.items).map((item) => renderPostCard(item)).join("")}
+          </div>
+        </section>
+      </div>
+      ${renderSidebar()}
+    </div>
   `;
 };
 
-const renderTools = () => {
-  const block = cfg.sections?.tools || {};
-  const items = normalizeList(block.items);
+const renderInformationPage = () => {
+  const page = cfg.pages?.information || {};
 
   return `
-    <section id="tools" class="section reveal">
-      <div class="section-head">
-        <h2>${block.title || "Tools"}</h2>
-        <p>${block.description || ""}</p>
+    <section class="page-head">
+      <h1>${page.pageTitle || "Information"}</h1>
+      <p>${page.intro || ""}</p>
+    </section>
+
+    <div class="portal-grid">
+      <div class="content-column">
+        <section class="content-block info-list">
+          ${asArray(page.list)
+            .map(
+              (item) => `
+            <article class="info-card">
+              <span>${item.badge || "Info"}</span>
+              <h3>${item.title || ""}</h3>
+              <p>${item.detail || ""}</p>
+            </article>
+          `
+            )
+            .join("")}
+        </section>
       </div>
-      <div class="tool-list">
-        ${items
-          .map(
-            (item) => `
-          <article class="card tool-item">
+      ${renderSidebar()}
+    </div>
+  `;
+};
+
+const renderToolsPage = () => {
+  const page = cfg.pages?.tools || {};
+
+  return `
+    <section class="page-head">
+      <h1>${page.pageTitle || "Tools"}</h1>
+      <p>${page.intro || ""}</p>
+    </section>
+
+    <div class="portal-grid">
+      <div class="content-column">
+        <section class="content-block tool-list">
+          ${asArray(page.items)
+            .map(
+              (item) => `
+            <article class="tool-card">
+              <div>
+                <h3>${item.name || "Tool"}</h3>
+                <p>${item.desc || ""}</p>
+              </div>
+              <div class="tool-meta">
+                <span>${item.status || "Planned"}</span>
+                <a href="${item.link || "#"}">Open</a>
+              </div>
+            </article>
+          `
+            )
+            .join("")}
+        </section>
+      </div>
+      ${renderSidebar()}
+    </div>
+  `;
+};
+
+const renderDownloadPage = () => {
+  const page = cfg.pages?.download || {};
+
+  return `
+    <section class="page-head">
+      <h1>${page.pageTitle || "Download"}</h1>
+      <p>${page.intro || ""}</p>
+    </section>
+
+    <div class="portal-grid">
+      <div class="content-column">
+        <section class="content-block download-list">
+          ${asArray(page.items)
+            .map(
+              (item) => `
+            <article class="download-card">
+              <h3>${item.title || "Materi"}</h3>
+              <p>${item.type || "FILE"} • ${item.size || "-"}</p>
+              <a class="primary-btn" href="${item.link || "#"}">Download</a>
+            </article>
+          `
+            )
+            .join("")}
+        </section>
+      </div>
+      ${renderSidebar()}
+    </div>
+  `;
+};
+
+const renderQuizPage = () => {
+  const page = cfg.pages?.quiz || {};
+
+  return `
+    <section class="page-head">
+      <h1>${page.pageTitle || "Quiz"}</h1>
+      <p>${page.intro || ""}</p>
+    </section>
+
+    <div class="portal-grid">
+      <div class="content-column">
+        <section class="content-block quiz-grid">
+          ${asArray(page.cards)
+            .map(
+              (item) => `
+            <article class="quiz-card">
+              <span>${item.level || "Level"}</span>
+              <h3>${item.title || "Quiz"}</h3>
+              <p>${item.desc || ""}</p>
+              <a class="primary-btn" href="${item.link || "#"}">${item.button || "Mulai"}</a>
+            </article>
+          `
+            )
+            .join("")}
+        </section>
+      </div>
+      ${renderSidebar()}
+    </div>
+  `;
+};
+
+const renderAboutPage = () => {
+  const page = cfg.pages?.about || {};
+  const profile = page.profile || {};
+
+  return `
+    <section class="page-head">
+      <h1>${page.pageTitle || "About"}</h1>
+      <p>${page.intro || ""}</p>
+    </section>
+
+    <div class="portal-grid">
+      <div class="content-column">
+        <section class="content-block about-wrap">
+          <article class="about-card">
+            <figure>
+              <img src="${profile.avatar || "assets/images/technician-illustration.svg"}" alt="${profile.avatarAlt || "Avatar"}" loading="lazy" />
+            </figure>
             <div>
-              <h3>${item.name}</h3>
-              <p>${item.desc}</p>
-            </div>
-            <div class="tool-meta">
-              <span class="pill">${item.status || "Planned"}</span>
-              <a href="${item.link || "#"}">Open</a>
+              <h3>${profile.name || "RyotaQC"}</h3>
+              <span>${profile.role || "Creator"}</span>
+              <p>${profile.bio || ""}</p>
             </div>
           </article>
-        `
-          )
-          .join("")}
+
+          <article class="contact-card">
+            <h3>Kontak</h3>
+            <ul>
+              ${asArray(page.contacts)
+                .map((item) => `<li><strong>${item.label}:</strong> ${item.value}</li>`)
+                .join("")}
+            </ul>
+          </article>
+        </section>
       </div>
-    </section>
+      ${renderSidebar()}
+    </div>
   `;
 };
 
-const renderQuiz = () => {
-  const block = cfg.sections?.quiz || {};
-
-  return `
-    <section id="quiz" class="section reveal">
-      <div class="section-head">
-        <h2>${block.title || "Quiz"}</h2>
-        <p>${block.description || ""}</p>
-      </div>
-      <article class="card card-center">
-        <a class="btn btn-primary" href="${block.ctaLink || "#"}">${block.ctaLabel || "Mulai Quiz"}</a>
-      </article>
-    </section>
-  `;
+const renderPageByKey = (pageKey) => {
+  switch (pageKey) {
+    case "home":
+      return renderHomePage();
+    case "articles":
+      return renderArticlesPage();
+    case "information":
+      return renderInformationPage();
+    case "tools":
+      return renderToolsPage();
+    case "download":
+      return renderDownloadPage();
+    case "quiz":
+      return renderQuizPage();
+    case "about":
+      return renderAboutPage();
+    default:
+      return renderHomePage();
+  }
 };
 
-const renderFaq = () => {
-  const block = cfg.sections?.faq || {};
-  const items = normalizeList(block.items);
-
-  return `
-    <section id="faq" class="section reveal">
-      <div class="section-head">
-        <h2>${block.title || "Faq"}</h2>
-        <p>${block.description || ""}</p>
-      </div>
-      <div class="faq-list">
-        ${items
-          .map(
-            (item) => `
-          <details class="faq-item card">
-            <summary>${item.q}</summary>
-            <p>${item.a}</p>
-          </details>
-        `
-          )
-          .join("")}
-      </div>
-    </section>
-  `;
-};
-
-const renderAbout = () => {
-  const block = cfg.sections?.about || {};
-  const contacts = normalizeList(block.contacts);
-
-  return `
-    <section id="about" class="section reveal">
-      <div class="section-head">
-        <h2>${block.title || "About Me"}</h2>
-        <p>${block.description || ""}</p>
-      </div>
-      <article class="card about-card">
-        <div class="about-main">
-          <h3>${block.name || "RyotaQC"}</h3>
-          <span>${block.role || "Creator"}</span>
-          <p>${block.bio || ""}</p>
-        </div>
-        <ul>
-          ${contacts.map((item) => `<li><strong>${item.label}:</strong> ${item.value}</li>`).join("")}
-        </ul>
-      </article>
-    </section>
-  `;
-};
-
-const renderMainSite = () => {
-  document.body.classList.remove("maintenance-mode", "menu-open");
+const renderSite = (pageKey) => {
+  document.body.classList.remove("maintenance-mode");
   document.body.classList.add("site-mode");
 
-  renderHeader();
+  renderTopNote();
+  renderHeader(pageKey);
 
   const app = q("#app");
-  if (!app) {
-    return;
+  if (app) {
+    app.innerHTML = renderPageByKey(pageKey);
   }
 
-  app.innerHTML = `
-    ${renderHero()}
-    ${renderBeranda()}
-    ${renderInformation()}
-    ${renderTools()}
-    ${renderQuiz()}
-    ${renderFaq()}
-    ${renderAbout()}
-  `;
-
   renderFooter(false);
-  setupRevealAnimation();
 };
 
 const renderDeveloperSiteDock = (devContext) => {
@@ -406,10 +542,10 @@ const renderDeveloperSiteDock = (devContext) => {
   dock.className = "dev-site-dock";
   dock.innerHTML = `
     <span>Developer Mode</span>
-    <button class="btn btn-ghost" type="button" data-dev-back-maint>${devContext.backLabel || "Back Maintenance"}</button>
+    <button type="button" class="primary-btn" data-back-maint>${devContext.backLabel || "Back Maintenance"}</button>
   `;
 
-  dock.querySelector("[data-dev-back-maint]")?.addEventListener("click", () => {
+  dock.querySelector("[data-back-maint]")?.addEventListener("click", () => {
     devContext.setView("maintenance");
   });
 
@@ -420,99 +556,77 @@ const renderMaintenanceMode = (devContext) => {
   document.body.classList.remove("site-mode", "menu-open");
   document.body.classList.add("maintenance-mode");
 
+  const topNote = q("#top-note");
+  if (topNote) {
+    topNote.innerHTML = "";
+  }
+
   const header = q("#site-header");
   if (header) {
     header.innerHTML = `
-      <div class="header-shell">
-        <a class="brand" href="#">
-          <span class="brand-dot"></span>
+      <div class="header-inner maintenance-head">
+        <a class="site-logo" href="index.html" aria-label="${cfg.site?.title || "RyotaQC"}">
+          <span class="logo-dot"></span>
           <div>
-            <strong>${cfg.site?.title || "RyotaQC"}</strong>
-            <small>Maintenance</small>
+            <strong>${cfg.site?.logoText || "RYOTAQC"}</strong>
+            <small>Maintenance Mode</small>
           </div>
         </a>
       </div>
     `;
   }
 
+  const maintenance = cfg.site?.maintenance || {};
   const app = q("#app");
+
   if (!app) {
     return;
   }
 
-  const maintenance = cfg.site?.maintenance || {};
-
   app.innerHTML = `
-    <section class="maintenance-wrap reveal">
+    <section class="maintenance-wrap">
       <article class="maintenance-card">
         ${
           devContext?.canBypass
             ? `
           <div class="maintenance-devbar">
             <span>Developer Access</span>
-            <button class="btn btn-ghost" type="button" data-maint-go-site>${devContext.goSiteLabel || "Go Site"}</button>
+            <button type="button" class="primary-btn" data-go-site>${devContext.goSiteLabel || "Go Site"}</button>
           </div>
         `
             : ""
         }
 
         <h1>${maintenance.title || "Website Sedang Maintenance"}</h1>
-        <p>${maintenance.message || "Website sedang dalam pengembangan."}</p>
+        <p>${maintenance.message || "Website sedang maintenance."}</p>
 
-        <figure class="maintenance-image">
+        <figure class="maintenance-visual">
           <img src="${maintenance.image || "assets/images/step-maintenance-repair.webp"}" alt="${maintenance.imageAlt || "Maintenance"}" loading="lazy" />
         </figure>
 
-        <section class="maintenance-game card">
+        <section class="maintenance-game">
           <div class="maintenance-game-head">
             <h2>${maintenance.gameTitle || "Tap Tap Shoot Basketball"}</h2>
-            <button class="btn btn-ghost" type="button" data-game-reset>Reset</button>
+            <button type="button" class="mini-btn" data-game-reset>Reset</button>
           </div>
-          <canvas id="maintenance-game-canvas" class="maintenance-game-canvas" aria-label="Mini game basket"></canvas>
-          <div class="maintenance-game-stats">
+          <canvas id="maintenance-game-canvas" class="maintenance-game-canvas" aria-label="Mini game basketball"></canvas>
+          <div class="maintenance-stats">
             <span data-game-score>Score: 0</span>
             <span data-game-shots>Shots: 0</span>
             <span data-game-best>Best: 0</span>
           </div>
-          <p class="maintenance-game-hint">Tap atau klik area game untuk menembak bola ke ring.</p>
+          <p class="maintenance-hint">Tap/klik untuk melempar bola ke ring. Bisa dimainkan di desktop maupun mobile.</p>
         </section>
       </article>
     </section>
   `;
 
-  q("[data-maint-go-site]")?.addEventListener("click", () => {
+  q("[data-go-site]")?.addEventListener("click", () => {
     devContext?.setView("site");
   });
 
   renderFooter(true);
-  setupRevealAnimation();
   setupMaintenanceGame();
-};
-
-const setupRevealAnimation = () => {
-  const targets = qa(".reveal");
-  if (!targets.length) {
-    return;
-  }
-
-  if (!("IntersectionObserver" in window)) {
-    targets.forEach((el) => el.classList.add("is-visible"));
-    return;
-  }
-
-  const obs = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          obs.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.14 }
-  );
-
-  targets.forEach((el) => obs.observe(el));
 };
 
 const setupMaintenanceGame = () => {
@@ -540,10 +654,10 @@ const setupMaintenanceGame = () => {
   const rim = {
     x: 0,
     y: 0,
-    width: 90,
+    width: 96,
     height: 10,
-    dir: 1,
-    speed: 1.5
+    speed: 1.5,
+    dir: 1
   };
 
   const ball = {
@@ -558,59 +672,12 @@ const setupMaintenanceGame = () => {
   };
 
   const gravity = 0.35;
-  let raf = null;
-  let dpr = 1;
+  let rafId = null;
   let width = 0;
   let height = 0;
   let shooterX = 0;
   let shooterY = 0;
-
-  const paint = () => {
-    ctx.clearRect(0, 0, width, height);
-
-    const bg = ctx.createLinearGradient(0, 0, 0, height);
-    bg.addColorStop(0, "#10244a");
-    bg.addColorStop(1, "#0a0f1d");
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, width, height);
-
-    ctx.fillStyle = "rgba(255,255,255,0.06)";
-    ctx.fillRect(0, height - 44, width, 44);
-
-    ctx.fillStyle = "#f2f6ff";
-    ctx.font = "600 18px Sora";
-    ctx.fillText("Tap to Shoot", 14, 28);
-
-    ctx.fillStyle = "#ff8f3f";
-    ctx.fillRect(rim.x, rim.y, rim.width, rim.height);
-
-    ctx.strokeStyle = "#dce7ff";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(rim.x + 8, rim.y + rim.height);
-    ctx.lineTo(rim.x + 8, rim.y + rim.height + 26);
-    ctx.lineTo(rim.x + rim.width - 8, rim.y + rim.height + 26);
-    ctx.lineTo(rim.x + rim.width - 8, rim.y + rim.height);
-    ctx.stroke();
-
-    ctx.fillStyle = "#7be0ff";
-    ctx.beginPath();
-    ctx.arc(shooterX, shooterY, 8, 0, Math.PI * 2);
-    ctx.fill();
-
-    if (ball.active) {
-      ctx.fillStyle = "#ff8f3f";
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.strokeStyle = "rgba(0,0,0,0.24)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(ball.x - 4, ball.y + 1, ball.r * 0.4, -0.9, 1.2);
-      ctx.stroke();
-    }
-  };
+  let dpr = 1;
 
   const updateStats = () => {
     if (scoreEl) scoreEl.textContent = `Score: ${state.score}`;
@@ -628,10 +695,57 @@ const setupMaintenanceGame = () => {
     ball.vy = 0;
   };
 
+  const draw = () => {
+    ctx.clearRect(0, 0, width, height);
+
+    const bg = ctx.createLinearGradient(0, 0, 0, height);
+    bg.addColorStop(0, "#1b305f");
+    bg.addColorStop(1, "#0c1428");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = "rgba(255,255,255,0.08)";
+    ctx.fillRect(0, height - 42, width, 42);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "600 17px Outfit";
+    ctx.fillText("Tap to Shoot", 16, 28);
+
+    ctx.fillStyle = "#ff8a3d";
+    ctx.fillRect(rim.x, rim.y, rim.width, rim.height);
+
+    ctx.strokeStyle = "#d9e6ff";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(rim.x + 8, rim.y + rim.height);
+    ctx.lineTo(rim.x + 8, rim.y + rim.height + 26);
+    ctx.lineTo(rim.x + rim.width - 8, rim.y + rim.height + 26);
+    ctx.lineTo(rim.x + rim.width - 8, rim.y + rim.height);
+    ctx.stroke();
+
+    ctx.fillStyle = "#86d4ff";
+    ctx.beginPath();
+    ctx.arc(shooterX, shooterY, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (ball.active) {
+      ctx.fillStyle = "#ff8a3d";
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(ball.x - 4, ball.y + 1, ball.r * 0.4, -0.9, 1.2);
+      ctx.stroke();
+    }
+  };
+
   const resize = () => {
     const rect = canvas.getBoundingClientRect();
     dpr = Math.max(window.devicePixelRatio || 1, 1);
-    width = Math.max(320, Math.floor(rect.width));
+    width = Math.max(300, Math.floor(rect.width));
     height = Math.max(280, Math.floor(rect.height));
 
     canvas.width = Math.floor(width * dpr);
@@ -639,24 +753,23 @@ const setupMaintenanceGame = () => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     shooterX = width * 0.5;
-    shooterY = height - 24;
+    shooterY = height - 22;
 
     rim.y = height * 0.18;
-    rim.x = Math.max(18, Math.min(width - rim.width - 18, width * 0.5 - rim.width * 0.5));
+    rim.x = Math.max(14, Math.min(width - rim.width - 14, width * 0.5 - rim.width * 0.5));
 
     if (!ball.active) {
       resetBall();
     }
 
-    paint();
+    draw();
   };
 
-  const shoot = (pointerX) => {
+  const shoot = (targetX) => {
     if (ball.active) {
       return;
     }
 
-    const targetX = typeof pointerX === "number" ? pointerX : width * 0.5;
     const dx = targetX - shooterX;
 
     ball.active = true;
@@ -706,41 +819,42 @@ const setupMaintenanceGame = () => {
       }
     }
 
-    paint();
-    raf = requestAnimationFrame(tick);
+    draw();
+    rafId = requestAnimationFrame(tick);
   };
 
-  const pointerHandler = (event) => {
+  const onPointer = (event) => {
     const rect = canvas.getBoundingClientRect();
     const clientX = "touches" in event && event.touches?.length ? event.touches[0].clientX : event.clientX;
     shoot(clientX - rect.left);
   };
 
-  canvas.addEventListener("click", pointerHandler);
-  canvas.addEventListener("touchstart", pointerHandler, { passive: true });
+  canvas.addEventListener("click", onPointer);
+  canvas.addEventListener("touchstart", onPointer, { passive: true });
 
   resetBtn?.addEventListener("click", () => {
     state.score = 0;
     state.shots = 0;
     updateStats();
     resetBall();
-    paint();
+    draw();
   });
 
   window.addEventListener("resize", resize);
 
   updateStats();
   resize();
-  raf = requestAnimationFrame(tick);
+  rafId = requestAnimationFrame(tick);
 
   window.addEventListener("beforeunload", () => {
-    if (raf) {
-      cancelAnimationFrame(raf);
+    if (rafId) {
+      cancelAnimationFrame(rafId);
     }
   });
 };
 
 const init = () => {
+  const pageKey = getCurrentPageKey();
   const maintenanceEnabled = Boolean(cfg.site?.maintenance?.enabled);
   const devContext = getMaintenanceDevContext();
 
@@ -749,7 +863,7 @@ const init = () => {
     return;
   }
 
-  renderMainSite();
+  renderSite(pageKey);
   renderDeveloperSiteDock(devContext);
 };
 
