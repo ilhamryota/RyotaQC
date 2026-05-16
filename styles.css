@@ -26,7 +26,7 @@ body {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
-  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  font-family: "Segoe UI", "Plus Jakarta Sans", sans-serif;
 }
 
 body.menu-open {
@@ -235,11 +235,17 @@ body.menu-open .mobile-drawer {
 
 .app {
   width: min(1100px, 100% - 1.2rem);
-  margin: 0.8rem auto 0;
+  margin: 0.45rem auto 0;
+}
+
+.home-sections {
+  display: grid;
+  gap: 2.1rem;
 }
 
 .software-section {
   background: #ffffff;
+  padding-bottom: 0.35rem;
 }
 
 .software-section-head {
@@ -283,7 +289,7 @@ body.menu-open .mobile-drawer {
 .software-list {
   margin-top: 1rem;
   display: grid;
-  gap: 2.15rem;
+  gap: 2.35rem;
 }
 
 .software-row {
@@ -357,6 +363,10 @@ body.menu-open .mobile-drawer {
   color: #808ea4;
   font-size: clamp(1.22rem, 1.75vw, 1.9rem);
   line-height: 1.6;
+}
+
+.software-row + .software-row {
+  padding-top: 0.05rem;
 }
 
 .hero-box {
@@ -979,6 +989,10 @@ body.maintenance-mode .site-header {
 
   .app {
     margin-top: 0.8rem;
+  }
+
+  .home-sections {
+    gap: 1.3rem;
   }
 
   .post-grid,

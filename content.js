@@ -16,7 +16,7 @@
     ],
     maintenance: {
       // Ubah true jika ingin maintenance aktif untuk pengunjung umum.
-      enabled: false,
+      enabled: true,
       title: "Website Sedang Maintenance",
       message:
         "RyotaQC sedang update besar. Silakan tunggu sebentar, kamu masih bisa main mini game di bawah ini.",
@@ -53,61 +53,129 @@
   pages: {
     home: {
       pageTitle: "Beranda",
-      sectionTitle: "Software Terbaru",
-      sliderPrevLabel: "\u00AB",
-      sliderNextLabel: "\u00BB",
-      softwareItems: [
+      sections: [
         {
-          category: "ADOBE",
-          categoryLink: "#",
-          date: "13 MEI 2026",
-          comments: "14 COMMENTS",
-          commentsLink: "#",
-          title: "Adobe Premiere Pro 2026 (Windows)",
-          href: "#",
-          excerpt:
-            "Adobe Premiere Pro 2026 Full Version Terbaru v26.2 Pernah ngalamin gak, lagi asyik-asyiknya edit video buat klien, tiba-tiba timeline Premiere Pro freeze dan project...",
-          image: "https://www.yasir252.com/wp-content/uploads/2026/03/download-premiere-pro-2026-full-version-windows.jpg",
-          imageAlt: "Adobe Premiere Pro 2026 Windows"
+          title: "Artikel Terbaru",
+          sliderPrevLabel: "\u00AB",
+          sliderNextLabel: "\u00BB",
+          items: [
+            {
+              category: "GRATISAN",
+              categoryLink: "#",
+              date: "15 MEI 2026",
+              comments: "NO COMMENT",
+              commentsLink: "#",
+              title: "Downora: Website Downloader Asset Premium (Wajib Bookmark!)",
+              href: "#",
+              excerpt:
+                "Downora.app: Website Downloader Asset Premium Gratis (Freepik, Envato, RawPixel, dan lainnya) Downora.app ini website 'penyelamat' buat orang-orang yang butuh file premium tapi gak punya budget...",
+              image: "assets/images/step-hardware-inspection.jpg",
+              imageAlt: "Artikel terbaru RyotaQC"
+            },
+            {
+              category: "MAC",
+              categoryLink: "#",
+              date: "05 MEI 2026",
+              comments: "NO COMMENT",
+              commentsLink: "#",
+              title: "Cara Menonaktifkan System Integrity Protection (SIP) di MacOS",
+              href: "#",
+              excerpt:
+                "Tutorial lengkap untuk mematikan SIP di MacOS secara aman, termasuk langkah pengecekan status sebelum dan sesudah perubahan.",
+              image: "assets/images/technician-illustration.svg",
+              imageAlt: "Tutorial MacOS SIP"
+            }
+          ]
         },
         {
-          category: "DESIGN",
-          categoryLink: "#",
-          date: "13 MEI 2026",
-          comments: "6 COMMENTS",
-          commentsLink: "#",
-          title: "Adobe Illustrator 2026 (Windows)",
-          href: "#",
-          excerpt:
-            "Adobe Illustrator 2026 Download Gratis v30.4 (PC) Membuat desain vektor tanpa Adobe Illustrator itu... seperti melukis pake ranting yang tipis, gak enak. Karena itulah,...",
-          image: "https://www.yasir252.com/wp-content/uploads/2026/03/download-adobe-illustrator-2026-full.jpg",
-          imageAlt: "Adobe Illustrator 2026 Windows"
+          title: "Software Terbaru",
+          sliderPrevLabel: "\u00AB",
+          sliderNextLabel: "\u00BB",
+          items: [
+            {
+              category: "ADOBE",
+              categoryLink: "#",
+              date: "13 MEI 2026",
+              comments: "14 COMMENTS",
+              commentsLink: "#",
+              title: "Adobe Premiere Pro 2026 (Windows)",
+              href: "#",
+              excerpt:
+                "Adobe Premiere Pro 2026 Full Version Terbaru v26.2 Pernah ngalamin gak, lagi asyik-asyiknya edit video buat klien, tiba-tiba timeline Premiere Pro freeze dan project...",
+              image: "https://www.yasir252.com/wp-content/uploads/2026/03/download-premiere-pro-2026-full-version-windows.jpg",
+              imageAlt: "Adobe Premiere Pro 2026 Windows"
+            },
+            {
+              category: "DESIGN",
+              categoryLink: "#",
+              date: "13 MEI 2026",
+              comments: "6 COMMENTS",
+              commentsLink: "#",
+              title: "Adobe Illustrator 2026 (Windows)",
+              href: "#",
+              excerpt:
+                "Adobe Illustrator 2026 Download Gratis v30.4 (PC) Membuat desain vektor tanpa Adobe Illustrator itu... seperti melukis pake ranting yang tipis, gak enak. Karena itulah,...",
+              image: "https://www.yasir252.com/wp-content/uploads/2026/03/download-adobe-illustrator-2026-full.jpg",
+              imageAlt: "Adobe Illustrator 2026 Windows"
+            },
+            {
+              category: "ADOBE",
+              categoryLink: "#",
+              date: "13 MEI 2026",
+              comments: "NO COMMENT",
+              commentsLink: "#",
+              title: "Adobe Media Encoder 2026 (Windows)",
+              href: "#",
+              excerpt:
+                "Adobe Media Encoder 2026 Download Terbaru (64 Bit) Pada artikel ini, YASIR252 mau share direct link untuk download aplikasi Media Encoder 2026 full version...",
+              image: "https://www.yasir252.com/wp-content/uploads/2026/04/download-adobe-media-encoder-2026.jpg",
+              imageAlt: "Adobe Media Encoder 2026 Windows"
+            },
+            {
+              category: "OFFICE",
+              categoryLink: "#",
+              date: "13 MEI 2026",
+              comments: "NO COMMENT",
+              commentsLink: "#",
+              title: "FX Math Tools",
+              href: "#",
+              excerpt:
+                "Download FX Math Tools Full Version Gratis FX Math Tools Free Download Full v26.05.04 Terbaru. Jika kalian ada seorang guru atau dosen dalam bidang...",
+              image: "https://www.yasir252.com/wp-content/uploads/2024/11/fx-math-tools-multidocs-free-download-full-version.jpg",
+              imageAlt: "FX Math Tools Windows"
+            }
+          ]
         },
         {
-          category: "ADOBE",
-          categoryLink: "#",
-          date: "13 MEI 2026",
-          comments: "NO COMMENT",
-          commentsLink: "#",
-          title: "Adobe Media Encoder 2026 (Windows)",
-          href: "#",
-          excerpt:
-            "Adobe Media Encoder 2026 Download Terbaru (64 Bit) Pada artikel ini, YASIR252 mau share direct link untuk download aplikasi Media Encoder 2026 full version...",
-          image: "https://www.yasir252.com/wp-content/uploads/2026/04/download-adobe-media-encoder-2026.jpg",
-          imageAlt: "Adobe Media Encoder 2026 Windows"
-        },
-        {
-          category: "OFFICE",
-          categoryLink: "#",
-          date: "13 MEI 2026",
-          comments: "NO COMMENT",
-          commentsLink: "#",
-          title: "FX Math Tools",
-          href: "#",
-          excerpt:
-            "Download FX Math Tools Full Version Gratis FX Math Tools Free Download Full v26.05.04 Terbaru. Jika kalian ada seorang guru atau dosen dalam bidang...",
-          image: "https://www.yasir252.com/wp-content/uploads/2024/11/fx-math-tools-multidocs-free-download-full-version.jpg",
-          imageAlt: "FX Math Tools Windows"
+          title: "PC Game Terbaru",
+          sliderPrevLabel: "\u00AB",
+          sliderNextLabel: "\u00BB",
+          items: [
+            {
+              category: "ACTION",
+              categoryLink: "#",
+              date: "15 MEI 2026",
+              comments: "22 COMMENTS",
+              commentsLink: "#",
+              title: "PRAGMATA Deluxe Edition -Voices38",
+              href: "#",
+              excerpt: "Direct download PC game terbaru lengkap dengan informasi update patch dan kebutuhan spesifikasi.",
+              image: "assets/images/step-maintenance-repair.jpg",
+              imageAlt: "PC game terbaru"
+            },
+            {
+              category: "SURVIVAL",
+              categoryLink: "#",
+              date: "15 MEI 2026",
+              comments: "1 COMMENT",
+              commentsLink: "#",
+              title: "Green Hell",
+              href: "#",
+              excerpt: "Koleksi game survival dan action terbaru untuk pengunjung yang mencari update game harian.",
+              image: "assets/images/windows8-update-screen.png",
+              imageAlt: "Game Green Hell"
+            }
+          ]
         }
       ]
     },

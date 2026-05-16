@@ -295,22 +295,48 @@ const renderSidebar = () => {
 
 const renderHomePage = () => {
   const page = cfg.pages?.home || {};
-  const items = asArray(page.softwareItems);
+  const sections = asArray(page.sections);
+
+  const sectionBlocks = sections.length
+    ? sections
+        .map(
+          (section) => `
+        <section class="software-section">
+          <header class="software-section-head">
+            <h2>${section.title || "Software Terbaru"}</h2>
+            <div class="software-head-nav" aria-hidden="true">
+              <button type="button" class="software-nav-btn">${section.sliderPrevLabel || "\u00AB"}</button>
+              <button type="button" class="software-nav-btn">${section.sliderNextLabel || "\u00BB"}</button>
+            </div>
+          </header>
+          <div class="software-divider"></div>
+          <div class="software-list">
+            ${asArray(section.items).map((item) => renderSoftwareRow(item)).join("")}
+          </div>
+        </section>
+      `
+        )
+        .join("")
+    : `
+      <section class="software-section">
+        <header class="software-section-head">
+          <h2>${page.sectionTitle || "Software Terbaru"}</h2>
+          <div class="software-head-nav" aria-hidden="true">
+            <button type="button" class="software-nav-btn">${page.sliderPrevLabel || "\u00AB"}</button>
+            <button type="button" class="software-nav-btn">${page.sliderNextLabel || "\u00BB"}</button>
+          </div>
+        </header>
+        <div class="software-divider"></div>
+        <div class="software-list">
+          ${asArray(page.softwareItems).map((item) => renderSoftwareRow(item)).join("")}
+        </div>
+      </section>
+    `;
 
   return `
-    <section class="software-section">
-      <header class="software-section-head">
-        <h2>${page.sectionTitle || "Software Terbaru"}</h2>
-        <div class="software-head-nav" aria-hidden="true">
-          <button type="button" class="software-nav-btn">${page.sliderPrevLabel || "\u00AB"}</button>
-          <button type="button" class="software-nav-btn">${page.sliderNextLabel || "\u00BB"}</button>
-        </div>
-      </header>
-      <div class="software-divider"></div>
-      <div class="software-list">
-        ${items.map((item) => renderSoftwareRow(item)).join("")}
-      </div>
-    </section>
+    <div class="home-sections">
+      ${sectionBlocks}
+    </div>
   `;
 };
 
